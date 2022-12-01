@@ -1,0 +1,34 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: continuumio/miniconda3
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout      
+
+      - run:
+          name: install dependencies
+          command: |
+
+            conda install -c conda-forge parameterized 
+            conda install -qy conda-build anaconda-client pytest pytest-cov
+
+            conda install -y numpy
+
+            conda config --set auto_update_conda no
+            conda info -a
+
+      - run:
+          name: run tests
+          command: |
+            # source activate adj
+            pytest --color=yes -v --cov=HyDGL tests
+            conda install -c conda-forge codecov
+            codecov -t 2cd4ccf8-2d89-40a4-88f4-1f5aec322959
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports

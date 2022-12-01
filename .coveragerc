@@ -1,0 +1,7 @@
+[report]
+omit =
+    setup.py
+    HyDGL/__main__.py
+    HyDGL/_version.py
+    versioneer.py
+    tests/*
