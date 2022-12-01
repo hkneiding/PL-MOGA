@@ -1,7 +1,7 @@
 import copy
 import numpy as np
 
-from individual import Individual
+from .individual import Individual
 
 
 def uniform_crossover(parent_1: Individual, parent_2: Individual, mixing_ratio: float = 0.5):

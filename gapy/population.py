@@ -1,6 +1,6 @@
 from typing import Callable
 
-from individual import Individual
+from .individual import Individual
 
 
 class Population:

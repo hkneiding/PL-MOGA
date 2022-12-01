@@ -3,14 +3,15 @@ import functools
 import subprocess
 import numpy as np
 import pandas as pd
+from scipy.sparse.csgraph import connected_components
 
 import uxtbpy
-from individual import Individual
-from population import Population
-from mutation import uniform_integer_mutation
-from crossover import uniform_crossover
-from selection import select_by_fitness, roulette_wheel_fitness
-from ga import GA
+from gapy.individual import Individual
+from gapy.population import Population
+from gapy.mutation import uniform_integer_mutation
+from gapy.crossover import uniform_crossover
+from gapy.selection import select_by_fitness, roulette_wheel_fitness
+from gapy.ga import GA
 
 
 def load_csv(file_path: str):
@@ -33,6 +34,65 @@ def load_csv(file_path: str):
     ligands = pd.read_csv(file_path, sep=',', dtype=dtypes, converters=converters)
 
     return ligands
+
+def parse_xyz(xyz: str):
+
+    """Parses a given xyz into two lists for atoms and positions respectively.
+
+    Returns:
+        list[str]: The list of atom identifiers.
+        list[list[float]]: The list of atomic positions.
+    """
+
+    atoms = []
+    positions = []
+
+    lines = xyz.split('\n')
+    for i in range(2, len(lines), 1):
+
+        line_split = lines[i].split()
+
+        if len(line_split) != 4:
+            break
+
+        atoms.append(line_split[0])
+        positions.append([float(line_split[i]) for i in [1, 2, 3]])
+
+    return atoms, positions
+
+def get_radius_adjacency_matrix(positions: list, radius_cutoff: float):
+
+    """Gets an adjacency matrix based on a radius cutoff.
+
+    Returns:
+        list[list[int]]: The adjacency matrix.
+    """
+
+    adjacency_matrix = np.zeros((len(positions), len(positions)))
+
+    for i in range(len(positions)):
+        for j in range(i+1, len(positions), 1):
+            
+            if np.linalg.norm(np.array(positions[i]) - np.array(positions[j])) <= radius_cutoff:
+                adjacency_matrix[i,j] = 1
+                adjacency_matrix[j,i] = 1
+
+    return adjacency_matrix
+
+def radius_graph_is_connected(positions: list, radius_cutoff: float):
+
+    """Checks if a radius graph based on a cutoff is connected or not.
+
+    Returns:
+        bool: The flag saying whether the graph is connected or not.
+    """
+
+    adj = get_radius_adjacency_matrix(positions, radius_cutoff)
+    n_connected_components = connected_components(adj)[0]
+
+    if n_connected_components == 1:
+        return True
+    return False
 
 def get_electron_count_from_xyz(xyz: str, charge: int = 0):
 
@@ -134,10 +194,17 @@ def fitness_function(individual, key_mapping, xyz, charges):
         print('xTB Failed: genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
         return [0]
 
-    stabilisation_energy = np.exp(- building_block_energy + result['energy'])
+    # check for ligand dissociation
+    is_connected = radius_graph_is_connected(parse_xyz(individual.meta['optimised_xyz'])[1], 3.0)
+    if not is_connected:
+        return [0]
+
+    # stabilisation_energy = building_block_energy - result['energy']
+    stabilisation_energy = -result['energy'] / get_electron_count_from_xyz(result['optimised_xyz'], calculate_total_charge(individual, charges))
+
     # return fitness vector
-    return [stabilisation_energy]
-    # return [result['homo_lumo_gap']]
+    # return [np.exp(stabilisation_energy)]
+    return [np.exp(-result['homo_lumo_gap'])]
 
 def flatten_list(list: list):
     return [item for sublist in list for item in sublist]
