@@ -1,6 +1,6 @@
 import numpy as np
 
-from individual import Individual
+from .individual import Individual
 
 
 def select_by_fitness(individuals: list, n_selected: int):
@@ -57,5 +57,5 @@ def pareto_domination_rank(individuals: list, n_selected):
                 
             if individual_1.dominates(individual_2):
                 rankings[i] += 1
-            
-    return [x for _, x in sorted(zip(rankings, individuals), key=lambda pair: pair[0])][0:n_selected]
+
+    return [x for _, x in sorted(zip(rankings, individuals), key=lambda pair: pair[0], reverse=True)][0:n_selected]

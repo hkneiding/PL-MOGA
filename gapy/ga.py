@@ -1,6 +1,6 @@
 import numpy as np
 
-from population import Population
+from .population import Population
 
 
 class GA:

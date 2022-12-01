@@ -1,6 +1,6 @@
 import numpy as np
 
-from individual import Individual
+from .individual import Individual
 
 
 def uniform_integer_mutation(individual: Individual, mutation_space: int, mutation_rate: float = 0.1):
