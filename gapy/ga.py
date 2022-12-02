@@ -44,11 +44,8 @@ class GA:
             # select survivors
             population.select(self.survivor_selection)
 
-            print(epoch)
-            # print('Epoch ' + str(epoch) + ' | Average fitness: ' + str(np.round(np.mean([individual['fitness'] for individual in population]), decimals=3)))
-        
-            for individual in population.individuals:
-                print(individual.genome)
+            print('Epoch ' + str(epoch) + ' | Average fitness: ' + str(np.round(np.mean([individual.fitness for individual in population.individuals], axis=0), decimals=3)))
+
         return population
 
     def get_offspring(self, population: list, n_offspring: int, n_allowed_duplicates: int = None):
