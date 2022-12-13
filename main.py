@@ -10,30 +10,50 @@ from gapy.individual import Individual
 from gapy.population import Population
 from gapy.mutation import uniform_integer_mutation
 from gapy.crossover import uniform_crossover
-from gapy.selection import select_by_fitness, roulette_wheel_fitness
+from gapy.selection import select_by_fitness, roulette_wheel_fitness, pareto_domination_rank
 from gapy.ga import GA
 
+element_identifiers = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',
+                        'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K',
+                        'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni',
+                        'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb',
+                        'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd',
+                        'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Te', 'I', 'Xe', 'Cs',
+                        'Ba', 'La', 'Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd',
+                        'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu', 'Hf', 'Ta',
+                        'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb',
+                        'Bi', 'Po', 'At', 'Rn']
 
-def load_csv(file_path: str):
+transition_metal_atomic_numbers = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30,                          # first block
+                                    39, 40, 41, 42, 43, 44, 45, 46, 47, 48,                          # second block
+                                    57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71,      # lanthanides
+                                    72, 73, 74, 75, 76, 77, 78, 79, 80,                              # third block
+                                    89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103,  # actinides
+                                    104, 105, 106, 107, 108, 109, 110, 111, 112]                     # fourth block
 
-    dtypes = {
-        'xyz': str,
-        'smiles': str,
-        'stoichiometry': str,
-        'occurrence': int,
-        'is_alternative_charge': int,
-        'charge': int
-    }
+def load_data(src_dir: str):
 
-    converters={
-        'metal_bond_node_idx_groups': eval,
-        'parent_metal_counts': eval,
-        'csd_origin': eval,
-    }
+    data_dict = {}
 
-    ligands = pd.read_csv(file_path, sep=',', dtype=dtypes, converters=converters)
+    with open(src_dir + 'ligands_xyz.xyz') as fh:
+        raw_xyz = fh.read()
 
-    return ligands
+    xyzs = raw_xyz.split('\n\n')
+    for xyz in xyzs:
+
+        id = xyz.split('\n')[1]
+        data_dict[id] = {'xyz': xyz}
+    
+    fingerprints = pd.read_csv(src_dir + 'ligands_fingerprints.csv', sep=';')
+    for fingerprint in fingerprints.to_dict(orient='records'):
+
+        data_dict[fingerprint['name']]['charge'] = fingerprint['charge']
+        data_dict[fingerprint['name']]['n_metal_bound'] = fingerprint['n_metal_bound']
+        data_dict[fingerprint['name']]['n_atoms'] = fingerprint['n_atoms']
+
+    df = pd.DataFrame(data_dict).T
+
+    return df
 
 def parse_xyz(xyz: str):
 
@@ -59,6 +79,35 @@ def parse_xyz(xyz: str):
         positions.append([float(line_split[i]) for i in [1, 2, 3]])
 
     return atoms, positions
+
+def get_metal_connecting_indices(xyz: str, radius_cutoff: float):
+
+    """Gets the indices of atoms connecting to metal based on a cutoff value.
+
+    Returns:
+        list[int]: The list of indices connecting to metal.
+    """
+
+    atoms, positions = parse_xyz(xyz)
+
+    metal_indices = []
+    for i, atom in enumerate(atoms):
+        if (element_identifiers.index(atom) + 1) in transition_metal_atomic_numbers:
+            metal_indices.append(i)
+
+    connecting_indices = []
+    for metal_index in metal_indices:
+
+        for i, position in enumerate(positions):
+
+            if metal_index == i:
+                continue
+
+            distance = np.linalg.norm(np.array(position) - np.array(positions[metal_index]))
+            if distance <= radius_cutoff:
+                connecting_indices.append(i)
+
+    return connecting_indices
 
 def get_radius_adjacency_matrix(positions: list, radius_cutoff: float):
 
@@ -96,18 +145,6 @@ def radius_graph_is_connected(positions: list, radius_cutoff: float):
 
 def get_electron_count_from_xyz(xyz: str, charge: int = 0):
 
-    element_identifiers = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',
-                           'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K',
-                           'Ca', 'Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni',
-                           'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', 'Rb',
-                           'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd',
-                           'Ag', 'Cd', 'In', 'Sn', 'Sb', 'Te', 'I', 'Xe', 'Cs',
-                           'Ba', 'La', 'Ce', 'Pr', 'Nd', 'Pm', 'Sm', 'Eu', 'Gd',
-                           'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu', 'Hf', 'Ta',
-                           'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb',
-                           'Bi', 'Po', 'At', 'Rn']
-
-
     lines = xyz.split('\n')
 
     n_electrons = 0
@@ -131,37 +168,17 @@ def calculate_total_charge(individual: Individual, charges: list):
     return individual.meta['oxidation_state'] + sum([int(charges[_]) for _ in individual.genome])
 
 
-def fitness_function(individual, key_mapping, xyz, charges):
+def fitness_function(individual, key_mapping, charges):
 
     """Calculates the fitness of a organometallic compound using xTB based on quantum properties.
 
     Returns:
         float: The fitness.
     """
-
+    print(1)
     # setup xTB runner
     xtb_runner = uxtbpy.XtbRunner(output_format='dict')
 
-    # calculate metal center
-    try:
-        xtb_parameters = ['--norestart -v -c ' + str(individual.meta['oxidation_state'])]
-        result = xtb_runner.run_xtb_from_xyz('1\n\n' + individual.meta['metal_centre'] + ' 0.0 0.0 0.0', parameters=xtb_parameters)
-    except RuntimeError:
-        print('xTB Failed: metal center')
-        return [0]
-
-    building_block_energy = result['energy']
-    # calculate stability
-    for allel in individual.genome:
-        
-        try:
-            xtb_parameters = ['--opt --norestart -v -c ' + str(charges[allel])]
-            result = xtb_runner.run_xtb_from_xyz(xyz[allel], parameters=xtb_parameters)
-            building_block_energy += result['energy']
-        except RuntimeError:
-            print('xTB Failed: ligand ' + key_mapping[allel])
-            return [0]
-    
     # remove existing molsimplify run directory
     shutil.rmtree('./Runs/run', ignore_errors=True)
     # prepare molsimplify parameters
@@ -184,27 +201,31 @@ def fitness_function(individual, key_mapping, xyz, charges):
             individual.meta['initial_xyz'] = xyz
     except FileNotFoundError:
         print('molSimplify Failed: genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
-        return [0]
+        return [0,0]
 
+    print(xyz)
     try:
-        xtb_parameters = ['--opt tight --uhf 0 --norestart -v -c ' + str(calculate_total_charge(individual, charges))]
+        xtb_parameters = ['--opt normal --uhf 0 --norestart -v -c ' + str(calculate_total_charge(individual, charges))]
         result = xtb_runner.run_xtb_from_xyz(xyz, parameters=xtb_parameters)
         individual.meta['optimised_xyz'] = result['optimised_xyz']
     except RuntimeError:
         print('xTB Failed: genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
-        return [0]
+        return [0,0]
 
-    # check for ligand dissociation
+    # check that connecting atoms are the same between initial and optimised xyz
+    initial_connecting_indices = get_metal_connecting_indices(individual.meta['initial_xyz'], 3.0)
+    optimised_connecting_indices = get_metal_connecting_indices(individual.meta['optimised_xyz'], 3.0)
+    if initial_connecting_indices != optimised_connecting_indices:
+        return [0,0]
+
+    # check for disconnected graphs
     is_connected = radius_graph_is_connected(parse_xyz(individual.meta['optimised_xyz'])[1], 3.0)
     if not is_connected:
-        return [0]
+        return [0,0]
 
-    # stabilisation_energy = building_block_energy - result['energy']
-    stabilisation_energy = -result['energy'] / get_electron_count_from_xyz(result['optimised_xyz'], calculate_total_charge(individual, charges))
+    # stabilisation_energy = -result['energy'] / get_electron_count_from_xyz(result['optimised_xyz'], calculate_total_charge(individual, charges))
 
-    # return fitness vector
-    # return [np.exp(stabilisation_energy)]
-    return [np.exp(-result['homo_lumo_gap'])]
+    return [np.exp(result['polarisability']), np.exp(result['homo_lumo_gap'])]
 
 def flatten_list(list: list):
     return [item for sublist in list for item in sublist]
@@ -219,33 +240,25 @@ def charge_range(individual, charges, allowed_charges):
 if __name__ == "__main__":
 
     # load ligand library
-    ligands_data = load_csv('/home/hkneiding/Documents/UiO/ligands-test/ligands.csv')
-
-    #(len(flatten_list(ligands_data['metal_bond_node_idx_groups'])) == 1)
+    ligands_fingerprints = pd.read_csv('/home/hkneiding/Documents/UiO/ligands-test/ligands/ligands_fingerprints.csv', sep=';')
     # get selection of ligands to allow
-
-    ligands_selection = ligands_data[ligands_data['metal_bond_node_idx_groups'].apply(lambda x: len(flatten_list(x)) == 1)]
-
-    ligands_selection = ligands_selection[(ligands_selection['xyz'].str.split('\n').str.len() <= 15)]
-
-    ligands_selection = ligands_selection[(ligands_selection['charge'] >= -2)]
+    ligands_selection = ligands_fingerprints[ligands_fingerprints['n_metal_bound'] == 1]
+    ligands_selection = ligands_selection[ligands_selection['n_atoms'] <= 15]
+    ligands_selection = ligands_selection[ligands_selection['charge'] >= -2]
 
     # build list of ligand names for mapping into integers (can add 'x' for empty coordination site)
     ligands_names = ligands_selection['name'].tolist()
     # build list of ligand charges (can add 0 for empty coordination site)
     ligands_charges = ligands_selection['charge'].tolist()
-    # build list of ligand xyzs
-    ligands_xyz = ligands_selection['xyz'].tolist()
-
 
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
     n_parents = 5
     n_population = 5
 
-    ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, xyz=ligands_xyz, charges=ligands_charges),
+    ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
             parent_selection=functools.partial(roulette_wheel_fitness, n_selected=n_parents),
-            survivor_selection=functools.partial(select_by_fitness, n_selected=n_population),
+            survivor_selection=functools.partial(pareto_domination_rank, n_selected=n_population),
             crossover=functools.partial(uniform_crossover, mixing_ratio=0.5),
             mutation=functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5),
             n_offspring=5,
@@ -266,7 +279,7 @@ if __name__ == "__main__":
     ]
     initial_population = Population(initial_individuals)
 
-    final_pop = ga.run(n_epochs=5, initial_population=initial_population)
+    final_pop = ga.run(n_epochs=10, initial_population=initial_population)
 
     for i, individual in enumerate(final_pop.individuals):
 
