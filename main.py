@@ -175,7 +175,7 @@ def fitness_function(individual, key_mapping, charges):
     Returns:
         float: The fitness.
     """
-    print(1)
+
     # setup xTB runner
     xtb_runner = uxtbpy.XtbRunner(output_format='dict')
 
@@ -203,7 +203,6 @@ def fitness_function(individual, key_mapping, charges):
         print('molSimplify Failed: genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
         return [0,0]
 
-    print(xyz)
     try:
         xtb_parameters = ['--opt normal --uhf 0 --norestart -v -c ' + str(calculate_total_charge(individual, charges))]
         result = xtb_runner.run_xtb_from_xyz(xyz, parameters=xtb_parameters)
@@ -241,10 +240,22 @@ if __name__ == "__main__":
 
     # load ligand library
     ligands_fingerprints = pd.read_csv('/home/hkneiding/Documents/UiO/ligands-test/ligands/ligands_fingerprints.csv', sep=';')
+    ligands_misc = pd.read_csv('/home/hkneiding/Documents/UiO/ligands-test/ligands/ligands_misc_info.csv', sep=';')[['name', 'occurrence']]
+    # merge csvs
+    ligands_data = ligands_fingerprints.merge(ligands_misc, on='name', how='inner')
+    ligands_data = ligands_data.sort_values('occurrence', ascending=False)
+
+    # ligands_data = pd.read_csv('/home/hkneiding/Downloads/ligands.csv', sep=',')
+    # ligands_data['metal_bond_node_idx_groups'] = ligands_data['metal_bond_node_idx_groups'].apply(lambda x: eval(x))
+    # ligands_selection = ligands_data[ligands_data['metal_bond_node_idx_groups'].apply(lambda x: len(flatten_list(x)) == 1)]
+    # ligands_selection = ligands_selection[(ligands_selection['xyz'].str.split('\n').str.len() <= 3 + 15)]
+    # ligands_selection = ligands_selection[(ligands_selection['charge'] >= -2)]
+
     # get selection of ligands to allow
-    ligands_selection = ligands_fingerprints[ligands_fingerprints['n_metal_bound'] == 1]
+    ligands_selection = ligands_data[ligands_data['n_metal_bound'] == 1]
     ligands_selection = ligands_selection[ligands_selection['n_atoms'] <= 15]
     ligands_selection = ligands_selection[ligands_selection['charge'] >= -2]
+    ligands_selection = ligands_selection.iloc[:100]
 
     # build list of ligand names for mapping into integers (can add 'x' for empty coordination site)
     ligands_names = ligands_selection['name'].tolist()
@@ -254,21 +265,18 @@ if __name__ == "__main__":
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
     n_parents = 5
-    n_population = 5
+    n_offspring = 2 * n_parents
+    n_population = 20
 
     ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
             parent_selection=functools.partial(roulette_wheel_fitness, n_selected=n_parents),
             survivor_selection=functools.partial(pareto_domination_rank, n_selected=n_population),
             crossover=functools.partial(uniform_crossover, mixing_ratio=0.5),
             mutation=functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5),
-            n_offspring=5,
+            n_offspring=n_offspring,
             n_allowed_duplicates=0,
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[0])]
     )
-
-    # palladium 2 coord 4 square planar
-    # in xtb: oxidation state of palladium? 2
-    # final charge should be in range -1,0,+1
 
     initial_individuals = [
         Individual([0,0,0,0], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
@@ -279,16 +287,9 @@ if __name__ == "__main__":
     ]
     initial_population = Population(initial_individuals)
 
-    final_pop = ga.run(n_epochs=10, initial_population=initial_population)
+    final_pop = ga.run(n_epochs=100, initial_population=initial_population)
 
     for i, individual in enumerate(final_pop.individuals):
-
-        # for a in [ligands_names[idx] for idx in individual.genome]:
-        #     print(a)
-
-        # print(individual.meta['initial_xyz'])
-        # print(individual.meta['optimised_xyz'])
-        # print('')
 
         with open('.temp/mol-' + str(i) + '-msinit.xyz', 'w') as fh:
             fh.write(individual.meta['initial_xyz']) 
