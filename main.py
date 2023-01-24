@@ -1,4 +1,5 @@
 import shutil
+import pickle
 import functools
 import subprocess
 import numpy as np
@@ -240,25 +241,30 @@ if __name__ == "__main__":
 
     # load ligand library
     ligands_fingerprints = pd.read_csv('/home/hkneiding/Documents/UiO/ligands-test/ligands/ligands_fingerprints.csv', sep=';')
-    ligands_misc = pd.read_csv('/home/hkneiding/Documents/UiO/ligands-test/ligands/ligands_misc_info.csv', sep=';')[['name', 'occurrence']]
+    ligands_misc = pd.read_csv('/home/hkneiding/Documents/UiO/ligands-test/ligands/ligands_misc_info.csv', sep=';')[['name', 'occurrence', 'parent_metal_occurrences']]
+
     # merge csvs
     ligands_data = ligands_fingerprints.merge(ligands_misc, on='name', how='inner')
-    ligands_data = ligands_data.sort_values('occurrence', ascending=False)
 
-    # ligands_data = pd.read_csv('/home/hkneiding/Downloads/ligands.csv', sep=',')
-    # ligands_data['metal_bond_node_idx_groups'] = ligands_data['metal_bond_node_idx_groups'].apply(lambda x: eval(x))
-    # ligands_selection = ligands_data[ligands_data['metal_bond_node_idx_groups'].apply(lambda x: len(flatten_list(x)) == 1)]
-    # ligands_selection = ligands_selection[(ligands_selection['xyz'].str.split('\n').str.len() <= 3 + 15)]
-    # ligands_selection = ligands_selection[(ligands_selection['charge'] >= -2)]
+    # consider only ligands that occur with paret metal Pd
+    ligands_data = ligands_data[ligands_data.apply(lambda x: 'Pd' in eval(x['parent_metal_occurrences']).keys(), axis=1)]
+
+    # determine Pd occurrence
+    ligands_data['pd_occurrence'] = ligands_data.apply(lambda x: len(eval(x['parent_metal_occurrences'])['Pd']), axis=1)
+
+    # sort by Pd occurrence
+    ligands_data = ligands_data.sort_values('pd_occurrence', ascending=False)
+
+    #print(ligands_data)
 
     # get selection of ligands to allow
     ligands_selection = ligands_data[ligands_data['n_metal_bound'] == 1]
-    ligands_selection = ligands_selection[ligands_selection['n_atoms'] <= 15]
+    ligands_selection = ligands_selection[ligands_selection['n_atoms'] <= 20]
     ligands_selection = ligands_selection[ligands_selection['charge'] >= -2]
-    ligands_selection = ligands_selection.iloc[:100]
+    ligands_selection = ligands_selection.iloc[:60]
 
     # build list of ligand names for mapping into integers (can add 'x' for empty coordination site)
-    ligands_names = ligands_selection['name'].tolist()
+    ligands_names = ligands_selection.apply(lambda x: eval(x['parent_metal_occurrences'])['Pd'][0], axis=1).tolist()
     # build list of ligand charges (can add 0 for empty coordination site)
     ligands_charges = ligands_selection['charge'].tolist()
 
@@ -287,7 +293,7 @@ if __name__ == "__main__":
     ]
     initial_population = Population(initial_individuals)
 
-    final_pop = ga.run(n_epochs=100, initial_population=initial_population)
+    final_pop, history = ga.run(n_epochs=100, initial_population=initial_population)
 
     for i, individual in enumerate(final_pop.individuals):
 
@@ -295,3 +301,6 @@ if __name__ == "__main__":
             fh.write(individual.meta['initial_xyz']) 
         with open('.temp/mol-' + str(i) + '-xtbopt.xyz', 'w') as fh:
             fh.write(individual.meta['optimised_xyz']) 
+
+    with open('.temp/history.pickle', 'wb') as fh:
+        pickle.dump(history, fh)

@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 
 from .population import Population
@@ -24,6 +25,9 @@ class GA:
 
         population = initial_population
 
+        # set up history of generations
+        history = [copy.deepcopy(population)]
+
         # calculate fitness of initial population
         print('Calculating fitness of initial population..')
         population.calculate_population_fitness(self.fitness_function)
@@ -44,9 +48,12 @@ class GA:
             # select survivors
             population.select(self.survivor_selection)
 
+            # update history
+            history.append(copy.deepcopy(population))
+            
             print('Epoch ' + str(epoch) + ' | Average fitness: ' + str(np.round(np.mean([individual.fitness for individual in population.individuals], axis=0), decimals=3)))
 
-        return population
+        return population, history
 
     def get_offspring(self, population: list, n_offspring: int, n_allowed_duplicates: int = None):
 
