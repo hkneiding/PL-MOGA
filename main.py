@@ -7,12 +7,6 @@ import pandas as pd
 from scipy.sparse.csgraph import connected_components
 
 import uxtbpy
-from gapy.individual import Individual
-from gapy.population import Population
-from gapy.mutation import uniform_integer_mutation
-from gapy.crossover import uniform_crossover
-from gapy.selection import select_by_fitness, roulette_wheel_fitness, pareto_domination_rank
-from gapy.ga import GA
 
 element_identifiers = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',
                         'Na', 'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K',
@@ -157,7 +151,7 @@ def get_electron_count_from_xyz(xyz: str, charge: int = 0):
 
     return n_electrons - charge
 
-def calculate_total_charge(individual: Individual, charges: list):
+def calculate_total_charge(individual, charges: list):
 
     """Calculates the total charge of an individual based on the metal oxidation state
     and the charges of ligands.
@@ -205,7 +199,8 @@ def fitness_function(individual, key_mapping, charges):
         return [0,0]
 
     try:
-        xtb_parameters = ['--opt normal --uhf 0 --norestart -v -c ' + str(calculate_total_charge(individual, charges))]
+        charge = calculate_total_charge(individual, charges)
+        xtb_parameters = ['--opt normal --uhf 0 --norestart -v -c ' + str(charge)]
         result = xtb_runner.run_xtb_from_xyz(xyz, parameters=xtb_parameters)
         individual.meta['optimised_xyz'] = result['optimised_xyz']
     except RuntimeError:
@@ -213,19 +208,21 @@ def fitness_function(individual, key_mapping, charges):
         return [0,0]
 
     # check that connecting atoms are the same between initial and optimised xyz
-    initial_connecting_indices = get_metal_connecting_indices(individual.meta['initial_xyz'], 3.0)
-    optimised_connecting_indices = get_metal_connecting_indices(individual.meta['optimised_xyz'], 3.0)
+    initial_connecting_indices = get_metal_connecting_indices(individual.meta['initial_xyz'], 2.5)
+    optimised_connecting_indices = get_metal_connecting_indices(individual.meta['optimised_xyz'], 2.5)
     if initial_connecting_indices != optimised_connecting_indices:
+        print('Connecting indices different')
         return [0,0]
 
     # check for disconnected graphs
     is_connected = radius_graph_is_connected(parse_xyz(individual.meta['optimised_xyz'])[1], 3.0)
     if not is_connected:
+        print('Graph not connected')
         return [0,0]
 
     # stabilisation_energy = -result['energy'] / get_electron_count_from_xyz(result['optimised_xyz'], calculate_total_charge(individual, charges))
 
-    return [np.exp(result['polarisability']), np.exp(result['homo_lumo_gap'])]
+    return [result['polarisability'], result['homo_lumo_gap']]
 
 def flatten_list(list: list):
     return [item for sublist in list for item in sublist]
@@ -239,34 +236,49 @@ def charge_range(individual, charges, allowed_charges):
                 
 if __name__ == "__main__":
 
+    from gapy.individual import Individual
+    from gapy.population import Population
+    from gapy.mutation import uniform_integer_mutation
+    from gapy.crossover import uniform_crossover
+    from gapy.selection import select_by_fitness, roulette_wheel_fitness, select_by_rank, roulette_wheel_rank
+    from gapy.rank import rank_dominate, rank_is_dominated, rank_non_dominated_fronts
+    from gapy.ga import GA
+
+    # fix random seed
+    np.random.seed(2023)
+
     # load ligand library
     ligands_fingerprints = pd.read_csv('/home/hkneiding/Documents/UiO/ligands-test/ligands/ligands_fingerprints.csv', sep=';')
     ligands_misc = pd.read_csv('/home/hkneiding/Documents/UiO/ligands-test/ligands/ligands_misc_info.csv', sep=';')[['name', 'occurrence', 'parent_metal_occurrences']]
 
-    # merge csvs
-    ligands_data = ligands_fingerprints.merge(ligands_misc, on='name', how='inner')
+    # # merge csvs
+    # ligands_data = ligands_fingerprints.merge(ligands_misc, on='name', how='inner')
 
-    # consider only ligands that occur with paret metal Pd
-    ligands_data = ligands_data[ligands_data.apply(lambda x: 'Pd' in eval(x['parent_metal_occurrences']).keys(), axis=1)]
+    # # consider only ligands that occur with paret metal Pd
+    # ligands_data = ligands_data[ligands_data.apply(lambda x: 'Pd' in eval(x['parent_metal_occurrences']).keys(), axis=1)]
 
-    # determine Pd occurrence
-    ligands_data['pd_occurrence'] = ligands_data.apply(lambda x: len(eval(x['parent_metal_occurrences'])['Pd']), axis=1)
+    # # determine Pd occurrence
+    # ligands_data['pd_occurrence'] = ligands_data.apply(lambda x: len(eval(x['parent_metal_occurrences'])['Pd']), axis=1)
 
-    # sort by Pd occurrence
-    ligands_data = ligands_data.sort_values('pd_occurrence', ascending=False)
+    # # sort by Pd occurrence
+    # ligands_data = ligands_data.sort_values('pd_occurrence', ascending=False)
 
-    #print(ligands_data)
+    # #print(ligands_data)
 
-    # get selection of ligands to allow
-    ligands_selection = ligands_data[ligands_data['n_metal_bound'] == 1]
-    ligands_selection = ligands_selection[ligands_selection['n_atoms'] <= 20]
-    ligands_selection = ligands_selection[ligands_selection['charge'] >= -2]
-    ligands_selection = ligands_selection.iloc[:60]
+    # # get selection of ligands to allow
+    # ligands_selection = ligands_data[ligands_data['n_metal_bound'] == 1]
+    # ligands_selection = ligands_selection[ligands_selection['n_atoms'] <= 10]
+    # ligands_selection = ligands_selection[ligands_selection['charge'] >= -1]
+    # ligands_selection = ligands_selection.iloc[:10]
 
-    # build list of ligand names for mapping into integers (can add 'x' for empty coordination site)
-    ligands_names = ligands_selection.apply(lambda x: eval(x['parent_metal_occurrences'])['Pd'][0], axis=1).tolist()
-    # build list of ligand charges (can add 0 for empty coordination site)
-    ligands_charges = ligands_selection['charge'].tolist()
+    # # build list of ligand names for mapping into integers (can add 'x' for empty coordination site)
+    # ligands_names = ligands_selection.apply(lambda x: eval(x['parent_metal_occurrences'])['Pd'][0], axis=1).tolist()
+    # # build list of ligand charges (can add 0 for empty coordination site)
+    # ligands_charges = ligands_selection['charge'].tolist()
+
+
+    ligands_names = ['RUCBEY-subgraph-1', 'WECJIA-subgraph-3', 'KEYRUB-subgraph-1', 'NURKEQ-subgraph-2', 'MEBXUN-subgraph-1', 'BIFMOV-subgraph-1', 'CUJYEL-subgraph-2', 'EZEXEM-subgraph-1', 'FOMVUB-subgraph-2', 'EFIHEJ-subgraph-3', 'LETTEL-subgraph-1', 'KAKKIR-subgraph-3', 'BICRIQ-subgraph-3', 'UPEGAZ-subgraph-2', 'CEVJAP-subgraph-2', 'BABTUT-subgraph-3', 'ZEJJEF-subgraph-3', 'KULGAZ-subgraph-2', 'CIGDAA-subgraph-1', 'HOVMIP-subgraph-3', 'ULUSIE-subgraph-1', 'IBEKUV-subgraph-1', 'REQSUD-subgraph-2', 'BOSJIF-subgraph-1', 'GUVMEP-subgraph-0', 'MAZJIJ-subgraph-0', 'OBONEA-subgraph-1', 'CORTOU-subgraph-2', 'LEVGUO-subgraph-2', 'REBWEB-subgraph-2', 'DOGPAS-subgraph-1', 'IJIMIX-subgraph-1', 'PEJGAN-subgraph-1', 'BIFZEX-subgraph-0', 'IRIXUC-subgraph-3', 'SAYGOO-subgraph-0', 'UROGIS-subgraph-1', 'MAQKEX-subgraph-1', 'LUQWUQ-subgraph-1', 'QAYDID-subgraph-2', 'MOYDOV-subgraph-3', 'NIZQUK-subgraph-1', 'SAYHIJ-subgraph-1', 'CIQGOY-subgraph-0', 'VUFZUT-subgraph-1', 'ZOQFIU-subgraph-0', 'GUQBUQ-subgraph-0', 'LEZYUM-subgraph-2', 'RAJXUX-subgraph-2', 'QEWZOH-subgraph-3']
+    ligands_charges = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
 
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
@@ -275,21 +287,21 @@ if __name__ == "__main__":
     n_population = 20
 
     ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
-            parent_selection=functools.partial(roulette_wheel_fitness, n_selected=n_parents),
-            survivor_selection=functools.partial(pareto_domination_rank, n_selected=n_population),
+            parent_selection=functools.partial(roulette_wheel_rank, n_selected=n_parents, rank_function=rank_non_dominated_fronts),
+            survivor_selection=functools.partial(select_by_rank, n_selected=n_population, rank_function=rank_is_dominated),
             crossover=functools.partial(uniform_crossover, mixing_ratio=0.5),
             mutation=functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5),
             n_offspring=n_offspring,
             n_allowed_duplicates=0,
-            solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[0])]
+            solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])]
     )
 
     initial_individuals = [
-        Individual([0,0,0,0], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
-        Individual([1,1,1,1], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
-        Individual([2,2,2,2], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
-        Individual([3,3,3,3], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
-        Individual([4,4,4,4], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'})
+        Individual([0,0,25,25], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
+        Individual([1,1,26,26], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
+        Individual([2,2,27,27], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
+        Individual([3,3,28,28], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
+        Individual([4,4,29,29], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'})
     ]
     initial_population = Population(initial_individuals)
 
@@ -302,5 +314,5 @@ if __name__ == "__main__":
         with open('.temp/mol-' + str(i) + '-xtbopt.xyz', 'w') as fh:
             fh.write(individual.meta['optimised_xyz']) 
 
-    with open('.temp/history.pickle', 'wb') as fh:
+    with open('history.pickle', 'wb') as fh:
         pickle.dump(history, fh)
