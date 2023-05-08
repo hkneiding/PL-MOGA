@@ -40,7 +40,7 @@ class GA:
             dict: Dictionary containing the history of populations and all investigated individuals.
         """
 
-        if population is not None:
+        if initial_population is not None:
             population = initial_population
         else:
             population = self._initialise_population()
