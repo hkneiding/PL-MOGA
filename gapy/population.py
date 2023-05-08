@@ -15,6 +15,22 @@ class Population:
 
         self.individuals = individuals
 
+    def get_selected_individuals(self, selection_function: Callable, n_elitism: int = 0):
+        
+        """Selects individuals based on specified rule.
+
+        Arguments:
+            selection_function (Callable): The function used to select individuals.
+            n_elitism (int): The number of elitism to apply.
+        """
+
+        # take out n_elitism individuals
+        selected_individuals = self.individuals[:n_elitism]
+        # perform selection on remaining
+        selected_individuals += selection_function(self.individuals[n_elitism:])
+
+        return selected_individuals
+
     def select(self, selection_function: Callable, n_elitism: int = 0):
         
         """Selects individuals based on specified rule.
@@ -63,6 +79,36 @@ class Population:
         for individual in self.individuals:
             individual.calculate_fitness(fitness_function)
 
+    def get_dominating_individuals(self, query_individual):
+
+        """Gets a list of individuals that a query individual is dominated by.
+
+        Returns:
+            list[Individuals]: The list of dominating individuals.
+        """
+
+        dominating_individuals = []
+        for individual in self.individuals:
+            if query_individual.is_dominated_by(individual):
+                dominating_individuals.append(individual)
+
+        return dominating_individuals
+
+    def get_dominated_individuals(self, query_individual):
+
+        """Gets a list of individuals that a query individual dominates.
+
+        Returns:
+            list[Individuals]: The list of dominated individuals.
+        """
+
+        dominated_individuals = []
+        for individual in self.individuals:
+            if query_individual.dominates(individual):
+                dominated_individuals.append(individual)
+
+        return dominated_individuals
+
     def rank_population(self, ranking_function: Callable):
 
         """Ranks and sorts the population according to a specified rule.
@@ -71,4 +117,5 @@ class Population:
             ranking_function (Callable): The function used to rank the individuals.
         """
 
-        self.individuals = ranking_function(self.individuals) 
+        pass
+        # self.individuals = ranking_function(self.individuals) 

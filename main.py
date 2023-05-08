@@ -247,41 +247,26 @@ if __name__ == "__main__":
     # fix random seed
     np.random.seed(2023)
 
-    # load ligand library
-    ligands_fingerprints = pd.read_csv('/home/hkneiding/Documents/UiO/ligands-test/ligands/ligands_fingerprints.csv', sep=';')
-    ligands_misc = pd.read_csv('/home/hkneiding/Documents/UiO/ligands-test/ligands/ligands_misc_info.csv', sep=';')[['name', 'occurrence', 'parent_metal_occurrences']]
-
-    # # merge csvs
-    # ligands_data = ligands_fingerprints.merge(ligands_misc, on='name', how='inner')
-
-    # # consider only ligands that occur with paret metal Pd
-    # ligands_data = ligands_data[ligands_data.apply(lambda x: 'Pd' in eval(x['parent_metal_occurrences']).keys(), axis=1)]
-
-    # # determine Pd occurrence
-    # ligands_data['pd_occurrence'] = ligands_data.apply(lambda x: len(eval(x['parent_metal_occurrences'])['Pd']), axis=1)
-
-    # # sort by Pd occurrence
-    # ligands_data = ligands_data.sort_values('pd_occurrence', ascending=False)
-
-    # #print(ligands_data)
-
-    # # get selection of ligands to allow
-    # ligands_selection = ligands_data[ligands_data['n_metal_bound'] == 1]
-    # ligands_selection = ligands_selection[ligands_selection['n_atoms'] <= 10]
-    # ligands_selection = ligands_selection[ligands_selection['charge'] >= -1]
-    # ligands_selection = ligands_selection.iloc[:10]
-
-    # # build list of ligand names for mapping into integers (can add 'x' for empty coordination site)
-    # ligands_names = ligands_selection.apply(lambda x: eval(x['parent_metal_occurrences'])['Pd'][0], axis=1).tolist()
-    # # build list of ligand charges (can add 0 for empty coordination site)
-    # ligands_charges = ligands_selection['charge'].tolist()
-
-
-    ligands_names = ['RUCBEY-subgraph-1', 'WECJIA-subgraph-3', 'KEYRUB-subgraph-1', 'NURKEQ-subgraph-2', 'MEBXUN-subgraph-1', 'BIFMOV-subgraph-1', 'CUJYEL-subgraph-2', 'EZEXEM-subgraph-1', 'FOMVUB-subgraph-2', 'EFIHEJ-subgraph-3', 'LETTEL-subgraph-1', 'KAKKIR-subgraph-3', 'BICRIQ-subgraph-3', 'UPEGAZ-subgraph-2', 'CEVJAP-subgraph-2', 'BABTUT-subgraph-3', 'ZEJJEF-subgraph-3', 'KULGAZ-subgraph-2', 'CIGDAA-subgraph-1', 'HOVMIP-subgraph-3', 'ULUSIE-subgraph-1', 'IBEKUV-subgraph-1', 'REQSUD-subgraph-2', 'BOSJIF-subgraph-1', 'GUVMEP-subgraph-0', 'MAZJIJ-subgraph-0', 'OBONEA-subgraph-1', 'CORTOU-subgraph-2', 'LEVGUO-subgraph-2', 'REBWEB-subgraph-2', 'DOGPAS-subgraph-1', 'IJIMIX-subgraph-1', 'PEJGAN-subgraph-1', 'BIFZEX-subgraph-0', 'IRIXUC-subgraph-3', 'SAYGOO-subgraph-0', 'UROGIS-subgraph-1', 'MAQKEX-subgraph-1', 'LUQWUQ-subgraph-1', 'QAYDID-subgraph-2', 'MOYDOV-subgraph-3', 'NIZQUK-subgraph-1', 'SAYHIJ-subgraph-1', 'CIQGOY-subgraph-0', 'VUFZUT-subgraph-1', 'ZOQFIU-subgraph-0', 'GUQBUQ-subgraph-0', 'LEZYUM-subgraph-2', 'RAJXUX-subgraph-2', 'QEWZOH-subgraph-3']
-    ligands_charges = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
-
+    # specify ligand space and charges
+    ligands_names = [
+        'RUCBEY-subgraph-1', 'WECJIA-subgraph-3', 'KEYRUB-subgraph-1', 'NURKEQ-subgraph-2', 'MEBXUN-subgraph-1',
+        'BIFMOV-subgraph-1', 'CUJYEL-subgraph-2', 'EZEXEM-subgraph-1', 'FOMVUB-subgraph-2', 'EFIHEJ-subgraph-3',
+        'LETTEL-subgraph-1', 'KAKKIR-subgraph-3', 'BICRIQ-subgraph-3', 'UPEGAZ-subgraph-2', 'CEVJAP-subgraph-2',
+        'BABTUT-subgraph-3', 'ZEJJEF-subgraph-3', 'KULGAZ-subgraph-2', 'CIGDAA-subgraph-1', 'HOVMIP-subgraph-3',
+        'ULUSIE-subgraph-1', 'IBEKUV-subgraph-1', 'REQSUD-subgraph-2', 'BOSJIF-subgraph-1', 'GUVMEP-subgraph-0',
+        'MAZJIJ-subgraph-0', 'OBONEA-subgraph-1', 'CORTOU-subgraph-2', 'LEVGUO-subgraph-2', 'REBWEB-subgraph-2',
+        'DOGPAS-subgraph-1', 'IJIMIX-subgraph-1', 'PEJGAN-subgraph-1', 'BIFZEX-subgraph-0', 'IRIXUC-subgraph-3',
+        'SAYGOO-subgraph-0', 'UROGIS-subgraph-1', 'MAQKEX-subgraph-1', 'LUQWUQ-subgraph-1', 'QAYDID-subgraph-2',
+        'MOYDOV-subgraph-3', 'NIZQUK-subgraph-1', 'SAYHIJ-subgraph-1', 'CIQGOY-subgraph-0', 'VUFZUT-subgraph-1',
+        'ZOQFIU-subgraph-0', 'GUQBUQ-subgraph-0', 'LEZYUM-subgraph-2', 'RAJXUX-subgraph-2', 'QEWZOH-subgraph-3'
+    ]
+    ligands_charges = [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+    ]
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
+    # GA parameters
     n_parents = 5
     n_offspring = 2 * n_parents
     n_population = 20
@@ -305,7 +290,7 @@ if __name__ == "__main__":
     ]
     initial_population = Population(initial_individuals)
 
-    final_pop, history = ga.run(n_epochs=100, initial_population=initial_population)
+    final_pop, log = ga.run(n_epochs=1, initial_population=initial_population)
 
     for i, individual in enumerate(final_pop.individuals):
 
@@ -314,5 +299,5 @@ if __name__ == "__main__":
         with open('.temp/mol-' + str(i) + '-xtbopt.xyz', 'w') as fh:
             fh.write(individual.meta['optimised_xyz']) 
 
-    with open('history.pickle', 'wb') as fh:
-        pickle.dump(history, fh)
+    with open('log.pickle', 'wb') as fh:
+        pickle.dump(log, fh)
