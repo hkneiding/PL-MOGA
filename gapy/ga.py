@@ -47,8 +47,8 @@ class GA:
 
         # set up history of generations
         log = {
-            'history': [copy.deepcopy(population)],
-            'explored_individuals': copy.deepcopy(population.individuals)      
+            'history': [population.as_dict()],
+            'explored_individuals': [_.as_dict() for _ in population.individuals]    
         }
 
         # calculate fitness of initial population
@@ -72,8 +72,8 @@ class GA:
             population.select(self.survivor_selection)
 
             # update log
-            log['history'].append(copy.deepcopy(population))
-            log['explored_individuals'].extend(offspring.individuals)
+            log['history'].append(population.as_dict())
+            log['explored_individuals'].extend([_.as_dict() for _ in offspring.individuals])
             
             print('Epoch ' + str(epoch) + ' | Average fitness: ' + str(np.round(np.mean([individual.fitness for individual in population.individuals], axis=0), decimals=3)))
 
