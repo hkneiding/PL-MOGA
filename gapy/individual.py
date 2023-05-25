@@ -17,6 +17,20 @@ class Individual:
         self._fitness = fitness
         self.meta = meta
     
+    def as_dict(self):
+
+        """Returns the class fields as a dict.
+
+        Returns:
+            dict: The dict of class fields.
+        """
+
+        return {
+            'genome': self.genome,
+            'fitness': self._fitness,
+            'meta': self.meta
+        }
+
     @property
     def fitness(self):
         return self._fitness

@@ -15,6 +15,18 @@ class Population:
 
         self.individuals = individuals
 
+    def as_dict(self):
+
+        """Returns the class fields as a dict.
+
+        Returns:
+            dict: The dict of class fields.
+        """
+
+        return {
+            'individuals': [_.as_dict() for _ in self.individuals]
+        }
+
     def get_selected_individuals(self, selection_function: Callable, n_elitism: int = 0):
         
         """Selects individuals based on specified rule.
