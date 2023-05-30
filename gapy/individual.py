@@ -52,6 +52,46 @@ class Individual:
         if self._fitness is None or force is True:
             self._fitness = fitness_function(self)
 
+    def get_dominating_features(self, individual):
+
+        """Determines which features of this instance are dominating compared to another indiviudal.
+        
+        Arguments:
+            individual (Individual): The individual to compare with.
+
+        Returns:
+            list[bool]: List of flags to determine which features are dominating.
+        """
+
+        dominating_features = []        
+        for i in range(len(self.fitness)):
+            if self.fitness[i] <= individual.fitness[i]:
+                dominating_features.append(False)
+            else:
+                dominating_features.append(True)
+
+        return dominating_features
+
+    def get_dominated_features(self, individual):
+
+        """Determines which features of this instance are dominated compared to another indiviudal.
+        
+        Arguments:
+            individual (Individual): The individual to compare with.
+
+        Returns:
+            list[bool]: List of flags to determine which features are dominated.
+        """
+
+        dominated_features = []        
+        for i in range(len(self.fitness)):
+            if self.fitness[i] >= individual.fitness[i]:
+                dominated_features.append(False)
+            else:
+                dominated_features.append(True)
+
+        return dominated_features
+
     def dominates(self, individual):
 
         """Determines whether this instance dominates another individual.
