@@ -241,7 +241,7 @@ if __name__ == "__main__":
     from gapy.mutation import uniform_integer_mutation
     from gapy.crossover import uniform_crossover
     from gapy.selection import select_by_fitness, roulette_wheel_fitness, select_by_rank, roulette_wheel_rank
-    from gapy.rank import rank_dominate, rank_is_dominated, rank_non_dominated_fronts
+    from gapy.rank import rank_dominate, rank_is_dominated, rank_non_dominated_fronts, rank_dominate_by_feature, rank_is_dominated_by_feature
     from gapy.ga import GA
 
     # fix random seed
@@ -267,12 +267,12 @@ if __name__ == "__main__":
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
     # GA parameters
-    n_parents = 5
+    n_parents = 15
     n_offspring = 2 * n_parents
-    n_population = 20
+    n_population = 100
 
     ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
-            parent_selection=functools.partial(roulette_wheel_rank, n_selected=n_parents, rank_function=rank_non_dominated_fronts),
+            parent_selection=functools.partial(roulette_wheel_rank, n_selected=n_parents, rank_function=functools.partial(rank_is_dominated_by_feature, weighting=[1,0.5])),
             survivor_selection=functools.partial(select_by_rank, n_selected=n_population, rank_function=rank_is_dominated),
             crossover=functools.partial(uniform_crossover, mixing_ratio=0.5),
             mutation=functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5),
@@ -290,7 +290,7 @@ if __name__ == "__main__":
     ]
     initial_population = Population(initial_individuals)
 
-    final_pop, log = ga.run(n_epochs=1, initial_population=initial_population)
+    final_pop, log = ga.run(n_epochs=100, initial_population=initial_population)
 
     for i, individual in enumerate(final_pop.individuals):
 
