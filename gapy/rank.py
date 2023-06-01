@@ -1,3 +1,82 @@
+def rank_dominate_by_feature(individuals: list, weighting: list = None):
+
+    """Ranks individuals by the number of individual features they dominate. The individual that dominates 
+    the most other individual features corresponds to rank 1.
+
+    Arguments:
+        individuals (list[Individual]): List of individuals.
+        weighting (list[float]): List of weights to specify the importance of features.
+
+    Returns:
+        list[int]: The list of rankings corresponding to the individuals.
+    """
+
+    domination_numbers = [0 for _ in individuals]
+    for i, individual_1 in enumerate(individuals):
+        for j, individual_2 in enumerate(individuals):
+
+            if i == j:
+                continue
+            
+            dominating_features = individual_1.get_dominating_features(individual_2)
+            for k, feature in enumerate(dominating_features):
+                if feature:
+                    # consider weighting of features
+                    if weighting is not None:
+                        domination_numbers[i] += 1 * weighting[k]
+                    else:
+                        domination_numbers[i] += 1
+
+    unique_domination_numbers = sorted(list(set(domination_numbers)), reverse=True)
+
+    rankings = [None for _ in individuals]
+    for i, unique_domination_number in enumerate(unique_domination_numbers):
+        for j, _ in enumerate(domination_numbers):
+            if domination_numbers[j] == unique_domination_number:
+                rankings[j] = i + 1
+
+    return rankings
+
+def rank_is_dominated_by_feature(individuals: list, weighting: list = None):
+
+    """Ranks individuals by the number of individual features they are dominated by. The individual that is dominated 
+    by the least other individual features corresponds to rank 1.
+
+    Arguments:
+        individuals (list[Individual]): List of individuals.
+        weighting (list[float]): List of weights to specify the importance of features.
+
+    Returns:
+        list[int]: The list of rankings corresponding to the individuals.
+    """
+
+    domination_numbers = [0 for _ in individuals]
+    for i, individual_1 in enumerate(individuals):
+        for j, individual_2 in enumerate(individuals):
+
+            if i == j:
+                continue
+            
+            dominating_features = individual_1.get_dominated_features(individual_2)
+            for k, feature in enumerate(dominating_features):
+                if feature:
+                    # consider weighting of features
+                    if weighting is not None:
+                        domination_numbers[i] += 1 * weighting[k]
+                    else:
+                        domination_numbers[i] += 1
+
+    unique_domination_numbers = sorted(list(set(domination_numbers)), reverse=False)
+
+    rankings = [None for _ in individuals]
+    for i, unique_domination_number in enumerate(unique_domination_numbers):
+        for j, _ in enumerate(domination_numbers):
+            if domination_numbers[j] == unique_domination_number:
+                rankings[j] = i + 1
+
+    return rankings
+
+
 def rank_dominate(individuals: list):
 
     """Ranks individuals by the number of individuals they dominate. The individual that dominates 
