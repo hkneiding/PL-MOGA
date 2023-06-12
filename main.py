@@ -298,7 +298,7 @@ if __name__ == "__main__":
         neutral_choice = np.random.randint(0, high=25, size=2)
         anionic_choice = np.random.randint(25, high=50, size=2)
 
-        genome = np.random.permutation(np.concatenate((neutral_choice, anionic_choice)))
+        genome = np.random.permutation(np.concatenate((neutral_choice, anionic_choice))).tolist()
         initial_individuals.append(Individual(genome=genome, meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}))
     initial_population = Population(initial_individuals)
 
