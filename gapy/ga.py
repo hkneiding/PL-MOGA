@@ -110,7 +110,7 @@ class GA:
                     # check if genome exists in current population and whether it exceeds allowed
                     # number of duplicates
 
-                    n_duplicates = [individual.genome for individual in population.individuals].count(child.genome) + [individual.genome for individual in population.individuals].count(child.genome)
+                    n_duplicates = [individual.genome for individual in population.individuals].count(child.genome)
 
                     if n_duplicates > self.n_allowed_duplicates:
                         continue                
