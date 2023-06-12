@@ -267,9 +267,9 @@ if __name__ == "__main__":
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
     # GA parameters
-    n_parents = 15
+    n_parents = 65
     n_offspring = 2 * n_parents
-    n_population = 100
+    n_population = 130
 
     ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
             parent_selection=functools.partial(roulette_wheel_rank, n_selected=n_parents, rank_function=functools.partial(rank_is_dominated_by_feature, weighting=[1,0.5])),
@@ -281,15 +281,18 @@ if __name__ == "__main__":
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])]
     )
 
-    initial_individuals = [
-        Individual([0,0,25,25], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
-        Individual([1,1,26,26], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
-        Individual([2,2,27,27], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
-        Individual([3,3,28,28], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}),
-        Individual([4,4,29,29], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'})
-    ]
+    # random initial population
+    initial_individuals = []
+    for i in range(n_population):
+
+        neutral_choice = np.random.randint(0, high=25, size=2)
+        anionic_choice = np.random.randint(25, high=50, size=2)
+
+        genome = np.random.permutation(np.concatenate((neutral_choice, anionic_choice)))
+        initial_individuals.append(Individual(genome=[0,0,0,0], meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}))
     initial_population = Population(initial_individuals)
 
+    # run ga
     final_pop, log = ga.run(n_epochs=100, initial_population=initial_population)
 
     for i, individual in enumerate(final_pop.individuals):
