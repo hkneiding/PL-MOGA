@@ -272,7 +272,7 @@ if __name__ == "__main__":
     n_population = 130
 
     ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
-            parent_selection=functools.partial(roulette_wheel_rank, n_selected=n_parents, rank_function=functools.partial(rank_is_dominated_by_feature, weighting=[1,0.5])),
+            parent_selection=functools.partial(roulette_wheel_rank, n_selected=n_parents, rank_function=rank_non_dominated_fronts),
             survivor_selection=functools.partial(select_by_rank, n_selected=n_population, rank_function=rank_is_dominated),
             crossover=functools.partial(uniform_crossover, mixing_ratio=0.5),
             mutation=functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5),
@@ -280,6 +280,16 @@ if __name__ == "__main__":
             n_allowed_duplicates=0,
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])]
     )
+
+    # ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
+    #         parent_selection=functools.partial(roulette_wheel_rank, n_selected=n_parents, rank_function=functools.partial(rank_is_dominated_by_feature, weighting=[1,0.5])),
+    #         survivor_selection=functools.partial(select_by_rank, n_selected=n_population, rank_function=rank_is_dominated),
+    #         crossover=functools.partial(uniform_crossover, mixing_ratio=0.5),
+    #         mutation=functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5),
+    #         n_offspring=n_offspring,
+    #         n_allowed_duplicates=0,
+    #         solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])]
+    # )
 
     # random initial population
     initial_individuals = []
