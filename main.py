@@ -26,6 +26,9 @@ transition_metal_atomic_numbers = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30,      
                                     89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103,  # actinides
                                     104, 105, 106, 107, 108, 109, 110, 111, 112]                     # fourth block
 
+def compose(*functions):
+    return functools.reduce(lambda f, g: lambda x: f(g(x)), functions)
+
 def load_data(src_dir: str):
 
     data_dict = {}
@@ -238,7 +241,7 @@ if __name__ == "__main__":
 
     from gapy.individual import Individual
     from gapy.population import Population
-    from gapy.mutation import uniform_integer_mutation
+    from gapy.mutation import uniform_integer_mutation, swap_mutation
     from gapy.crossover import uniform_crossover
     from gapy.selection import select_by_fitness, roulette_wheel_fitness, select_by_rank, roulette_wheel_rank
     from gapy.rank import rank_dominate, rank_is_dominated, rank_non_dominated_fronts, rank_dominate_by_feature, rank_is_dominated_by_feature
@@ -271,11 +274,14 @@ if __name__ == "__main__":
     n_offspring = 2 * n_parents
     n_population = 130
 
+    sub_mutation_1 = functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5)
+    sub_mutation_2 = functools.partial(swap_mutation, mutation_rate=0.5)
+
     ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
             parent_selection=functools.partial(roulette_wheel_rank, n_selected=n_parents, rank_function=rank_non_dominated_fronts),
             survivor_selection=functools.partial(select_by_rank, n_selected=n_population, rank_function=rank_is_dominated),
             crossover=functools.partial(uniform_crossover, mixing_ratio=0.5),
-            mutation=functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5),
+            mutation=compose(sub_mutation_2, sub_mutation_1),
             n_offspring=n_offspring,
             n_allowed_duplicates=0,
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])]
