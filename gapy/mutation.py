@@ -35,12 +35,12 @@ def swap_mutation(individual: Individual, mutation_rate: float = 0.1):
     """
 
     if np.random.rand() < mutation_rate:
-        swap_indices = np.choice(list(range(len(individual['genome']))), size=2, replace=False)
+        swap_indices = np.random.choice(list(range(len(individual.genome))), size=2, replace=False)
 
-        swap_gene_1 = individual['genome'][swap_indices[0]]
-        swap_gene_2 = individual['genome'][swap_indices[1]]
+        swap_gene_1 = individual.genome[swap_indices[0]]
+        swap_gene_2 = individual.genome[swap_indices[1]]
 
-        individual['genome'][swap_indices[0]] = swap_gene_2
-        individual['genome'][swap_indices[1]] = swap_gene_1
+        individual.genome[swap_indices[0]] = swap_gene_2
+        individual.genome[swap_indices[1]] = swap_gene_1
 
     return individual
