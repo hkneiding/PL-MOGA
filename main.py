@@ -53,6 +53,28 @@ def load_data(src_dir: str):
 
     return df
 
+def are_rotation_equivalents(l1: list, l2: list):
+
+    """Checks if two lists are rotational equivalents of each other.
+
+    Arguments:
+        l1 (list): The first list.
+        l2 (list): The second list.
+
+    Returns:
+        bool: The flag indicating whether or not the lists are rotation equivalent.
+    """
+
+    if len(l1) != len(l2):
+        return False
+
+    l1_extended = l1 * 2
+    for i in range(len(l1_extended) - len(l1)):
+        if l1_extended[i:i + len(l1)] == l2:
+            return True
+    
+    return False
+
 def parse_xyz(xyz: str):
 
     """Parses a given xyz into two lists for atoms and positions respectively.
@@ -284,7 +306,8 @@ if __name__ == "__main__":
             mutation=compose(sub_mutation_2, sub_mutation_1),
             n_offspring=n_offspring,
             n_allowed_duplicates=0,
-            solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])]
+            solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])],
+            genome_equivalence_function=are_rotation_equivalents
     )
 
     # ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
