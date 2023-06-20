@@ -6,7 +6,7 @@ from .population import Population
 
 class GA:
         
-    def __init__(self, fitness_function, parent_selection, survivor_selection, crossover, mutation, n_offspring, n_allowed_duplicates, solution_constraints):
+    def __init__(self, fitness_function, parent_selection, survivor_selection, crossover, mutation, n_offspring, n_allowed_duplicates, solution_constraints, genome_equivalence_function):
 
         """Constructor for the GA class.
 
@@ -26,6 +26,8 @@ class GA:
         self.n_allowed_duplicates = n_allowed_duplicates
 
         self.solution_constraints = solution_constraints
+
+        self.genome_equivalence_function = genome_equivalence_function
 
     def run(self, n_epochs: int, initial_population: Population = None):
 
@@ -110,7 +112,11 @@ class GA:
                     # check if genome exists in current population and whether it exceeds allowed
                     # number of duplicates
 
-                    n_duplicates = [individual.genome for individual in population.individuals].count(child.genome)
+                    n_duplicates = 0
+                    for individual in population.individuals:
+
+                        if self.genome_equivalence_function(child.genome, individual.genome):
+                            n_duplicates += 0
 
                     if n_duplicates > self.n_allowed_duplicates:
                         continue                
