@@ -71,6 +71,9 @@ def are_rotation_equivalents(l1: list, l2: list):
     l1_extended = l1 * 2
     for i in range(len(l1_extended) - len(l1)):
         if l1_extended[i:i + len(l1)] == l2:
+            print(l1)
+            print(l2)
+            print('')
             return True
     
     return False
@@ -225,7 +228,7 @@ def fitness_function(individual, key_mapping, charges):
 
     try:
         charge = calculate_total_charge(individual, charges)
-        xtb_parameters = ['--opt normal --uhf 0 --norestart -v -c ' + str(charge)]
+        xtb_parameters = ['--opt tight --uhf 0 --norestart -v -c ' + str(charge)]
         result = xtb_runner.run_xtb_from_xyz(xyz, parameters=xtb_parameters)
         individual.meta['optimised_xyz'] = result['optimised_xyz']
     except RuntimeError:
