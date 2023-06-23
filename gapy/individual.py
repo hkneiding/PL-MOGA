@@ -15,6 +15,7 @@ class Individual:
 
         self.genome = genome
         self._fitness = fitness
+        self._masked_fitness = None
         self.meta = meta
     
     def as_dict(self):
@@ -33,10 +34,23 @@ class Individual:
 
     @property
     def fitness(self):
+
+        if self._masked_fitness is not None:
+
+            print(self._fitness)
+            print(self._masked_fitness)
+            print('')
+
+            return self._masked_fitness
+
         return self._fitness
 
     @property
     def fitness_sum(self):
+
+        if self._masked_fitness is not None:
+            return sum(self._masked_fitness)
+        
         return sum(self._fitness)
 
     def calculate_fitness(self, fitness_function: Callable, force: bool = False):

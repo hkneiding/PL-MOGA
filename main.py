@@ -71,12 +71,31 @@ def are_rotation_equivalents(l1: list, l2: list):
     l1_extended = l1 * 2
     for i in range(len(l1_extended) - len(l1)):
         if l1_extended[i:i + len(l1)] == l2:
-            print(l1)
-            print(l2)
-            print('')
             return True
     
     return False
+
+def zero_mask_target_by_population_average(individual, individuals, target_idx):
+
+    """Masks one fitness target of the individual by zeroing below average of population.
+
+    Returns:
+        list: The masked fitness
+    """
+
+    target_population = []
+    for _ in individuals:
+        target_population.append(_._fitness[target_idx])
+
+    target_population_average = np.median(target_population)
+
+    print(target_population)
+    print('Population average:', target_population_average)
+    
+    if individual._fitness[target_idx] < target_population_average:
+        return [0, 0]
+
+    return individual._fitness
 
 def parse_xyz(xyz: str):
 
@@ -167,6 +186,12 @@ def radius_graph_is_connected(positions: list, radius_cutoff: float):
     return False
 
 def get_electron_count_from_xyz(xyz: str, charge: int = 0):
+
+    """Get the number of electrons from a xyz file.
+
+    Returns:
+        int: The electron count.
+    """
 
     lines = xyz.split('\n')
 
@@ -295,9 +320,9 @@ if __name__ == "__main__":
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
     # GA parameters
-    n_parents = 65
+    n_parents = 2
     n_offspring = 2 * n_parents
-    n_population = 130
+    n_population = 4
 
     sub_mutation_1 = functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5)
     sub_mutation_2 = functools.partial(swap_mutation, mutation_rate=0.5)
@@ -310,7 +335,8 @@ if __name__ == "__main__":
             n_offspring=n_offspring,
             n_allowed_duplicates=0,
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])],
-            genome_equivalence_function=are_rotation_equivalents
+            genome_equivalence_function=are_rotation_equivalents,
+            masking_function=functools.partial(zero_mask_target_by_population_average, target_idx=0)
     )
 
     # ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),

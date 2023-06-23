@@ -91,6 +91,17 @@ class Population:
         for individual in self.individuals:
             individual.calculate_fitness(fitness_function)
 
+    def get_masked_population_fitness(self, masking_function: Callable):
+        
+        """Gets the masked fitnesses of all individuals according to some masking function.
+
+        Arguments:
+            masking_function (Callable): The masking function to be used.
+        """
+
+        for individual in self.individuals:
+            individual._masked_fitness = masking_function(individual, self.individuals)
+
     def get_dominating_individuals(self, query_individual):
 
         """Gets a list of individuals that a query individual is dominated by.

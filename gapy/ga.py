@@ -6,7 +6,12 @@ from .population import Population
 
 class GA:
         
-    def __init__(self, fitness_function, parent_selection, survivor_selection, crossover, mutation, n_offspring, n_allowed_duplicates, solution_constraints, genome_equivalence_function):
+    def __init__(self, 
+                 fitness_function, 
+                 parent_selection, survivor_selection, 
+                 crossover, mutation, 
+                 n_offspring, n_allowed_duplicates, 
+                 solution_constraints, genome_equivalence_function, masking_function):
 
         """Constructor for the GA class.
 
@@ -28,6 +33,7 @@ class GA:
         self.solution_constraints = solution_constraints
 
         self.genome_equivalence_function = genome_equivalence_function
+        self.masking_function = masking_function
 
     def run(self, n_epochs: int, initial_population: Population = None):
 
@@ -56,7 +62,9 @@ class GA:
         # calculate fitness of initial population
         print('Calculating fitness of initial population..')
         population.calculate_population_fitness(self.fitness_function)
-
+        # get fitness masks
+        population.get_masked_population_fitness(self.masking_function)
+        
         # start GA iterations
         print('Starting iterations..')
         for epoch in range(1, n_epochs + 1):
@@ -69,7 +77,10 @@ class GA:
 
             # extend existing population with offspring
             population.extend(offspring)
-
+            
+            # get fitness masks
+            population.get_masked_population_fitness(self.masking_function)
+        
             # select survivors
             population.select(self.survivor_selection)
 
