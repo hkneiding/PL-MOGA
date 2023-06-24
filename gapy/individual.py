@@ -37,9 +37,9 @@ class Individual:
 
         if self._masked_fitness is not None:
 
-            print(self._fitness)
-            print(self._masked_fitness)
-            print('')
+            # print(self._fitness)
+            # print(self._masked_fitness)
+            # print('')
 
             return self._masked_fitness
 
