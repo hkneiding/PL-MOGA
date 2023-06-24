@@ -320,9 +320,9 @@ if __name__ == "__main__":
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
     # GA parameters
-    n_parents = 2
+    n_parents = 65
     n_offspring = 2 * n_parents
-    n_population = 4
+    n_population = 130
 
     sub_mutation_1 = functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5)
     sub_mutation_2 = functools.partial(swap_mutation, mutation_rate=0.5)
@@ -336,7 +336,7 @@ if __name__ == "__main__":
             n_allowed_duplicates=0,
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])],
             genome_equivalence_function=are_rotation_equivalents,
-            masking_function=functools.partial(zero_mask_target_by_population_average, target_idx=0)
+            masking_function=lambda x,y: None #functools.partial(zero_mask_target_by_population_average, target_idx=0)
     )
 
     # ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
