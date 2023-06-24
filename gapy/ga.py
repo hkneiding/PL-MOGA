@@ -127,7 +127,7 @@ class GA:
                     for individual in population.individuals:
 
                         if self.genome_equivalence_function(child.genome, individual.genome):
-                            n_duplicates += 0
+                            n_duplicates += 1
 
                     if n_duplicates > self.n_allowed_duplicates:
                         continue                
