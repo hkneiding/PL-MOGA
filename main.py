@@ -89,8 +89,7 @@ def zero_mask_target_by_population_average(individual, individuals, target_idx):
 
     target_population_average = np.median(target_population)
 
-    print(target_population)
-    print('Population average:', target_population_average)
+    print('Population median:', target_population_average)
     
     if individual._fitness[target_idx] < target_population_average:
         return [0, 0]
@@ -336,7 +335,7 @@ if __name__ == "__main__":
             n_allowed_duplicates=0,
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])],
             genome_equivalence_function=are_rotation_equivalents,
-            masking_function=lambda x,y: None #functools.partial(zero_mask_target_by_population_average, target_idx=0)
+            masking_function=functools.partial(zero_mask_target_by_population_average, target_idx=0)
     )
 
     # ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
