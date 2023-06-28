@@ -75,7 +75,7 @@ def are_rotation_equivalents(l1: list, l2: list):
     
     return False
 
-def zero_mask_target_by_population_average(individual, individuals, target_idx):
+def zero_mask_target_by_population_average(individual, individuals, target_indices):
 
     """Masks one fitness target of the individual by zeroing below average of population.
 
@@ -83,16 +83,16 @@ def zero_mask_target_by_population_average(individual, individuals, target_idx):
         list: The masked fitness
     """
 
-    target_population = []
-    for _ in individuals:
-        target_population.append(_._fitness[target_idx])
+    for target_idx in target_indices:
+      
+        target_population = []
+        for _ in individuals:
+            target_population.append(_._fitness[target_idx])
 
-    target_population_average = np.median(target_population)
-
-    print('Population median:', target_population_average)
-    
-    if individual._fitness[target_idx] < target_population_average:
-        return [0, 0]
+        target_population_average = np.median(target_population)
+        
+        if individual._fitness[target_idx] < target_population_average:
+            return [0, 0]
 
     return individual._fitness
 
@@ -335,7 +335,7 @@ if __name__ == "__main__":
             n_allowed_duplicates=0,
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])],
             genome_equivalence_function=are_rotation_equivalents,
-            masking_function=functools.partial(zero_mask_target_by_population_average, target_idx=0)
+            masking_function=functools.partial(zero_mask_target_by_population_average, target_indices=[0,1])
     )
 
     # ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
