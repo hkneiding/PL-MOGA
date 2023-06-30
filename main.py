@@ -75,7 +75,7 @@ def are_rotation_equivalents(l1: list, l2: list):
     
     return False
 
-def zero_mask_target_by_population_average(individual, individuals, target_indices):
+def zero_mask_target_by_population_average(individual, individuals, target_indices, scaling=1):
 
     """Masks one fitness target of the individual by zeroing below average of population.
 
@@ -89,9 +89,9 @@ def zero_mask_target_by_population_average(individual, individuals, target_indic
         for _ in individuals:
             target_population.append(_._fitness[target_idx])
 
-        target_population_average = np.median(target_population)
+        target_population_average = np.mean(target_population)
         
-        if individual._fitness[target_idx] < target_population_average:
+        if individual._fitness[target_idx] < scaling * target_population_average:
             return [0, 0]
 
     return individual._fitness
