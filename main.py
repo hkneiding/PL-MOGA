@@ -335,7 +335,7 @@ if __name__ == "__main__":
             n_allowed_duplicates=0,
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])],
             genome_equivalence_function=are_rotation_equivalents,
-            masking_function=functools.partial(zero_mask_target_by_population_average, target_indices=[0,1])
+            masking_function=functools.partial(zero_mask_target_by_population_average, target_indices=[1])
     )
 
     # ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
