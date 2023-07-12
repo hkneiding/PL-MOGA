@@ -296,32 +296,20 @@ if __name__ == "__main__":
     from gapy.rank import rank_dominate, rank_is_dominated, rank_non_dominated_fronts, rank_dominate_by_feature, rank_is_dominated_by_feature
     from gapy.ga import GA
 
+    from ligands_info import get_ligand_names_and_charges
+
     # fix random seed
     np.random.seed(2023)
 
     # specify ligand space and charges
-    ligands_names = [
-        'RUCBEY-subgraph-1', 'WECJIA-subgraph-3', 'KEYRUB-subgraph-1', 'NURKEQ-subgraph-2', 'MEBXUN-subgraph-1',
-        'BIFMOV-subgraph-1', 'CUJYEL-subgraph-2', 'EZEXEM-subgraph-1', 'FOMVUB-subgraph-2', 'EFIHEJ-subgraph-3',
-        'LETTEL-subgraph-1', 'KAKKIR-subgraph-3', 'BICRIQ-subgraph-3', 'UPEGAZ-subgraph-2', 'CEVJAP-subgraph-2',
-        'BABTUT-subgraph-3', 'ZEJJEF-subgraph-3', 'KULGAZ-subgraph-2', 'CIGDAA-subgraph-1', 'HOVMIP-subgraph-3',
-        'ULUSIE-subgraph-1', 'IBEKUV-subgraph-1', 'REQSUD-subgraph-2', 'BOSJIF-subgraph-1', 'GUVMEP-subgraph-0',
-        'MAZJIJ-subgraph-0', 'OBONEA-subgraph-1', 'CORTOU-subgraph-2', 'LEVGUO-subgraph-2', 'REBWEB-subgraph-2',
-        'DOGPAS-subgraph-1', 'IJIMIX-subgraph-1', 'PEJGAN-subgraph-1', 'BIFZEX-subgraph-0', 'IRIXUC-subgraph-3',
-        'SAYGOO-subgraph-0', 'UROGIS-subgraph-1', 'MAQKEX-subgraph-1', 'LUQWUQ-subgraph-1', 'QAYDID-subgraph-2',
-        'MOYDOV-subgraph-3', 'NIZQUK-subgraph-1', 'SAYHIJ-subgraph-1', 'CIQGOY-subgraph-0', 'VUFZUT-subgraph-1',
-        'ZOQFIU-subgraph-0', 'GUQBUQ-subgraph-0', 'LEZYUM-subgraph-2', 'RAJXUX-subgraph-2', 'QEWZOH-subgraph-3'
-    ]
-    ligands_charges = [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-    ]
+    ligands_names, ligands_charges = get_ligand_names_and_charges('1B')
+
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
     # GA parameters
-    n_parents = 65
-    n_offspring = 2 * n_parents
     n_population = 130
+    n_parents = n_population // 2
+    n_offspring = n_population
 
     sub_mutation_1 = functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5)
     sub_mutation_2 = functools.partial(swap_mutation, mutation_rate=0.5)
