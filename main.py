@@ -75,9 +75,9 @@ def are_rotation_equivalents(l1: list, l2: list):
     
     return False
 
-def zero_mask_target_by_population_average(individual, individuals, target_indices, scaling=1):
+def zero_mask_target_by_population_median(individual, individuals, target_indices, scaling=1):
 
-    """Masks one fitness target of the individual by zeroing below average of population.
+    """Masks one fitness target of the individual by zeroing below median of population.
 
     Returns:
         list: The masked fitness
@@ -89,7 +89,7 @@ def zero_mask_target_by_population_average(individual, individuals, target_indic
         for _ in individuals:
             target_population.append(_._fitness[target_idx])
 
-        target_population_average = np.mean(target_population)
+        target_population_average = np.median(target_population)
         
         if individual._fitness[target_idx] < scaling * target_population_average:
             return [0, 0]
@@ -323,18 +323,8 @@ if __name__ == "__main__":
             n_allowed_duplicates=0,
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])],
             genome_equivalence_function=are_rotation_equivalents,
-            masking_function=functools.partial(zero_mask_target_by_population_average, target_indices=[1])
+            masking_function=functools.partial(zero_mask_target_by_population_median, target_indices=[], scaling=1)
     )
-
-    # ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
-    #         parent_selection=functools.partial(roulette_wheel_rank, n_selected=n_parents, rank_function=functools.partial(rank_is_dominated_by_feature, weighting=[1,0.5])),
-    #         survivor_selection=functools.partial(select_by_rank, n_selected=n_population, rank_function=rank_is_dominated),
-    #         crossover=functools.partial(uniform_crossover, mixing_ratio=0.5),
-    #         mutation=functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5),
-    #         n_offspring=n_offspring,
-    #         n_allowed_duplicates=0,
-    #         solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])]
-    # )
 
     # random initial population
     initial_individuals = []
