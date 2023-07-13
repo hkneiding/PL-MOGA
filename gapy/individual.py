@@ -36,11 +36,6 @@ class Individual:
     def fitness(self):
 
         if self._masked_fitness is not None:
-
-            # print(self._fitness)
-            # print(self._masked_fitness)
-            # print('')
-
             return self._masked_fitness
 
         return self._fitness
@@ -52,6 +47,17 @@ class Individual:
             return sum(self._masked_fitness)
         
         return sum(self._fitness)
+
+    def set_fitness(self, fitness):
+
+        """Sets the fitness of the individual.
+
+        Arguments:
+            fitness (list): The fitness.
+        """
+
+        self._fitness = fitness
+        self._masked_fitness = None
 
     def calculate_fitness(self, fitness_function: Callable, force: bool = False):
         
