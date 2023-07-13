@@ -1,4 +1,5 @@
 from typing import Callable
+import multiprocessing as mp
 
 from .individual import Individual
 
@@ -87,9 +88,14 @@ class Population:
         Arguments:
             fitness_function (Callable): The fitness function to be used.
         """
+  
+        with mp.Pool(int(mp.cpu_count() / 1.5)) as p:    
+            fitnesses = p.map(fitness_function, self.individuals)
+            p.close()
+            p.join()
 
-        for individual in self.individuals:
-            individual.calculate_fitness(fitness_function)
+        for i, _ in enumerate(self.individuals):
+            self.individuals[i].set_fitness(fitnesses[i])
 
     def get_masked_population_fitness(self, masking_function: Callable):
         
