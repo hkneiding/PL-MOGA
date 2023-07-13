@@ -1,9 +1,11 @@
+import os
 import shutil
 import pickle
 import functools
 import subprocess
 import numpy as np
 import pandas as pd
+from contextlib import contextmanager
 from scipy.sparse.csgraph import connected_components
 
 import uxtbpy
@@ -25,6 +27,17 @@ transition_metal_atomic_numbers = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30,      
                                     72, 73, 74, 75, 76, 77, 78, 79, 80,                              # third block
                                     89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103,  # actinides
                                     104, 105, 106, 107, 108, 109, 110, 111, 112]                     # fourth block
+
+
+@contextmanager
+def change_directory(destination: str):
+    try:
+        cwd = os.getcwd()
+        os.chdir(destination)
+        yield
+    finally:
+        os.chdir(cwd)
+
 
 def compose(*functions):
     return functools.reduce(lambda f, g: lambda x: f(g(x)), functions)
@@ -214,7 +227,6 @@ def calculate_total_charge(individual, charges: list):
 
     return individual.meta['oxidation_state'] + sum([int(charges[_]) for _ in individual.genome])
 
-
 def fitness_function(individual, key_mapping, charges):
 
     """Calculates the fitness of a organometallic compound using xTB based on quantum properties.
@@ -223,42 +235,51 @@ def fitness_function(individual, key_mapping, charges):
         float: The fitness.
     """
 
-    # setup xTB runner
-    xtb_runner = uxtbpy.XtbRunner(output_format='dict')
+    # set unique run directory
+    tmp_dir = '.' +  str(id(individual))  + '/'
 
-    # remove existing molsimplify run directory
-    shutil.rmtree('./Runs/run', ignore_errors=True)
-    # prepare molsimplify parameters
-    parameters = ['-skipANN True',
-                  '-core ' + individual.meta['metal_centre'],
-                  '-geometry ' + individual.meta['coordination_geometry'],
-                  '-lig ' + ','.join([key_mapping[idx] for idx in individual.genome]),
-                  '-coord ' + str(len(individual.genome)),
-                  '-ligocc ' + ','.join(['1' for _ in individual.genome]),
-                  '-name run',
-                  '-oxstate ' + str(individual.meta['oxidation_state'])
-    ]
-    # run molsimplify
-    result = subprocess.run(['molsimplify', *parameters], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    os.mkdir(tmp_dir)
+    with change_directory(tmp_dir):
+        # prepare molsimplify parameters
+        parameters = ['-skipANN True',
+                    '-core ' + individual.meta['metal_centre'],
+                    '-geometry ' + individual.meta['coordination_geometry'],
+                    '-lig ' + ','.join([key_mapping[idx] for idx in individual.genome]),
+                    '-coord ' + str(len(individual.genome)),
+                    '-ligocc ' + ','.join(['1' for _ in individual.genome]),
+                    '-name run',
+                    '-oxstate ' + str(individual.meta['oxidation_state'])
+        ]
+        # run molsimplify
+        result = subprocess.run(['molsimplify', *parameters], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     try:
         # read the xyz from molsimplify output
-        with open('./Runs/run/run/run.xyz') as fh:
+        with open(tmp_dir + '/Runs/run/run/run.xyz') as fh:
             xyz = fh.read()
             individual.meta['initial_xyz'] = xyz
+
+        # setup xTB runner
+        xtb_runner = uxtbpy.XtbRunner(xtb_directory=tmp_dir, output_format='dict')
+
+        charge = calculate_total_charge(individual, charges)
+        xtb_parameters = ['--opt normal --uhf 0 --norestart -v -c ' + str(charge)]
+        result = xtb_runner.run_xtb_from_xyz(xyz, parameters=xtb_parameters)
+        individual.meta['optimised_xyz'] = result['optimised_xyz']
+
     except FileNotFoundError:
+        print(result)
+
         print('molSimplify Failed: genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
         return [0,0]
 
-    try:
-        charge = calculate_total_charge(individual, charges)
-        xtb_parameters = ['--opt tight --uhf 0 --norestart -v -c ' + str(charge)]
-        result = xtb_runner.run_xtb_from_xyz(xyz, parameters=xtb_parameters)
-        individual.meta['optimised_xyz'] = result['optimised_xyz']
     except RuntimeError:
         print('xTB Failed: genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
         return [0,0]
 
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+        
     # check that connecting atoms are the same between initial and optimised xyz
     initial_connecting_indices = get_metal_connecting_indices(individual.meta['initial_xyz'], 2.5)
     optimised_connecting_indices = get_metal_connecting_indices(individual.meta['optimised_xyz'], 2.5)
