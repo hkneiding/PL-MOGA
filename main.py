@@ -92,6 +92,12 @@ def zero_mask_target_by_population_median(individual, individuals, target_indice
 
     """Masks one fitness target of the individual by zeroing below median of population.
 
+    Arguments:
+        individual (Individual): The current individual.
+        individuals (list[Individual]: The list of individuals.
+        target_indices (list[int]): The target indices to zero mask.
+        scaling: (list[float]): The scalings to apply to each of the target indices.
+
     Returns:
         list: The masked fitness
     """
@@ -101,10 +107,8 @@ def zero_mask_target_by_population_median(individual, individuals, target_indice
         target_population = []
         for _ in individuals:
             target_population.append(_._fitness[target_idx])
-
-        target_population_average = np.median(target_population)
         
-        if individual._fitness[target_idx] < scaling * target_population_average:
+        if individual._fitness[target_idx] < scaling[target_idx] * np.median(target_population):
             return [0, 0]
 
     return individual._fitness
@@ -323,7 +327,7 @@ if __name__ == "__main__":
     np.random.seed(2023)
 
     # specify ligand space and charges
-    ligands_names, ligands_charges = get_ligand_names_and_charges('1B')
+    ligands_names, ligands_charges = get_ligand_names_and_charges('1M')
 
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
@@ -344,7 +348,7 @@ if __name__ == "__main__":
             n_allowed_duplicates=0,
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])],
             genome_equivalence_function=are_rotation_equivalents,
-            masking_function=functools.partial(zero_mask_target_by_population_median, target_indices=[], scaling=1)
+            masking_function=functools.partial(zero_mask_target_by_population_median, target_indices=[0,1], scaling=[0.5,1])
     )
 
     # random initial population
