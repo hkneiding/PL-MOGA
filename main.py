@@ -240,7 +240,9 @@ def fitness_function(individual, key_mapping, charges):
     """
 
     # set unique run directory
-    tmp_dir = '.' +  str(id(individual))  + '/'
+    tmp_dir = str(id(individual))  + '/'
+    while os.path.exists(tmp_dir):
+        tmp_dir = str(id(individual)) + tmp_dir
 
     os.mkdir(tmp_dir)
     with change_directory(tmp_dir):
@@ -332,7 +334,7 @@ if __name__ == "__main__":
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
     # GA parameters
-    n_population = 130
+    n_population = 4
     n_parents = n_population // 2
     n_offspring = n_population
 
