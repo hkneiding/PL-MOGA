@@ -1,4 +1,5 @@
 import os
+import datetime
 import shutil
 import pickle
 import functools
@@ -240,9 +241,9 @@ def fitness_function(individual, key_mapping, charges):
     """
 
     # set unique run directory
-    tmp_dir = str(id(individual))  + '/'
-    while os.path.exists(tmp_dir):
-        tmp_dir = str(id(individual)) + tmp_dir
+    tmp_dir = str(id(individual)) + str(datetime.datetime.now()).replace(' ', '') + '/'
+    # while os.path.exists(tmp_dir):
+    #     tmp_dir = str(id(individual)) + tmp_dir
 
     os.mkdir(tmp_dir)
     with change_directory(tmp_dir):
