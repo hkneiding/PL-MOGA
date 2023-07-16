@@ -241,7 +241,7 @@ def fitness_function(individual, key_mapping, charges):
     """
 
     # set unique run directory
-    tmp_dir = str(id(individual)) + str(datetime.datetime.now()).replace(' ', '') + '/'
+    tmp_dir = str(id(individual)) + individual.meta['creation_date'].replace(' ', '') + '/'
     # while os.path.exists(tmp_dir):
     #     tmp_dir = str(id(individual)) + tmp_dir
 
@@ -362,7 +362,12 @@ if __name__ == "__main__":
         anionic_choice = np.random.randint(25, high=50, size=2)
 
         genome = np.random.permutation(np.concatenate((neutral_choice, anionic_choice))).tolist()
-        initial_individuals.append(Individual(genome=genome, meta={'metal_centre': 'Pd', 'oxidation_state': 2, 'coordination_geometry': 'sqp'}))
+        initial_individuals.append(Individual(genome=genome, meta={
+            'metal_centre': 'Pd',
+            'oxidation_state': 2,
+            'coordination_geometry': 'sqp',
+            'creation_date': str(datetime.datetime.now())}
+        ))
     initial_population = Population(initial_individuals)
 
     # run ga

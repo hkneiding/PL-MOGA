@@ -1,4 +1,5 @@
 import copy
+import datetime
 import numpy as np
 
 from .individual import Individual
@@ -24,4 +25,6 @@ def uniform_crossover(parent_1: Individual, parent_2: Individual, mixing_ratio: 
         else:
             child_genome.append(parent_2.genome[i])
 
-    return Individual(child_genome, meta=copy.deepcopy(parent_1.meta))
+    meta = copy.deepcopy(parent_1.meta)
+    meta['creation_date'] = str(datetime.datetime.now())
+    return Individual(child_genome, meta=meta)
