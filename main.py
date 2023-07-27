@@ -270,7 +270,7 @@ def fitness_function(individual, key_mapping, charges):
         xtb_runner = uxtbpy.XtbRunner(xtb_directory=tmp_dir, output_format='dict')
 
         charge = calculate_total_charge(individual, charges)
-        xtb_parameters = ['--opt normal --uhf 0 --norestart -v -c ' + str(charge)]
+        xtb_parameters = ['--opt tight --uhf 0 --norestart -v -c ' + str(charge)]
         result = xtb_runner.run_xtb_from_xyz(xyz, parameters=xtb_parameters)
         individual.meta['optimised_xyz'] = result['optimised_xyz']
 
@@ -283,6 +283,11 @@ def fitness_function(individual, key_mapping, charges):
     except RuntimeError:
         print('xTB Failed: genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
         return [0,0]
+
+    except Exception:
+        print('Other error')
+        print(charge)
+        print(xyz)
 
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
@@ -371,14 +376,13 @@ if __name__ == "__main__":
     initial_population = Population(initial_individuals)
 
     # run ga
-    final_pop, log = ga.run(n_epochs=100, initial_population=initial_population)
+    final_pop, log = ga.run(n_epochs=1, initial_population=initial_population)
 
     for i, individual in enumerate(final_pop.individuals):
-
-        with open('.temp/mol-' + str(i) + '-msinit.xyz', 'w') as fh:
-            fh.write(individual.meta['initial_xyz']) 
-        with open('.temp/mol-' + str(i) + '-xtbopt.xyz', 'w') as fh:
-            fh.write(individual.meta['optimised_xyz']) 
+        
+        print(individual.meta)
+        # print(individual.meta['initial_xyz']) 
+        # print(individual.meta['optimised_xyz']) 
 
     with open('log.pickle', 'wb') as fh:
         pickle.dump(log, fh)
