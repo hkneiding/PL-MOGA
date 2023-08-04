@@ -288,6 +288,7 @@ def fitness_function(individual, key_mapping, charges):
         print('Other error')
         print(charge)
         print(xyz)
+        return [0,0]
 
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
