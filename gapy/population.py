@@ -89,13 +89,12 @@ class Population:
             fitness_function (Callable): The fitness function to be used.
         """
   
-        with mp.Pool(int(mp.cpu_count() / 1.5)) as p:    
-            fitnesses = p.map(fitness_function, self.individuals)
+        with mp.Pool(int(mp.cpu_count() - 2)) as p:    
+            individuals = p.map(fitness_function, self.individuals)
             p.close()
             p.join()
 
-        for i, _ in enumerate(self.individuals):
-            self.individuals[i].set_fitness(fitnesses[i])
+        self.individuals = individuals
 
     def get_masked_population_fitness(self, masking_function: Callable):
         
