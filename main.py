@@ -278,17 +278,20 @@ def fitness_function(individual, key_mapping, charges):
         print(result)
 
         print('molSimplify Failed: genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
-        return [0,0]
+        individual.set_fitness([0,0])
+        return individual
 
     except RuntimeError:
         print('xTB Failed: genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
-        return [0,0]
+        individual.set_fitness([0,0])
+        return individual
 
     except Exception:
         print('Other error')
         print(charge)
         print(xyz)
-        return [0,0]
+        individual.set_fitness([0,0])
+        return individual
 
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
@@ -298,17 +301,20 @@ def fitness_function(individual, key_mapping, charges):
     optimised_connecting_indices = get_metal_connecting_indices(individual.meta['optimised_xyz'], 2.5)
     if initial_connecting_indices != optimised_connecting_indices:
         print('Connecting indices different')
-        return [0,0]
+        individual.set_fitness([0,0])
+        return individual
 
     # check for disconnected graphs
     is_connected = radius_graph_is_connected(parse_xyz(individual.meta['optimised_xyz'])[1], 3.0)
     if not is_connected:
         print('Graph not connected')
-        return [0,0]
+        individual.set_fitness([0,0])
+        return individual
 
     # stabilisation_energy = -result['energy'] / get_electron_count_from_xyz(result['optimised_xyz'], calculate_total_charge(individual, charges))
 
-    return [result['polarisability'], result['homo_lumo_gap']]
+    individual.set_fitness([result['polarisability'], result['homo_lumo_gap']])
+    return individual 
 
 def flatten_list(list: list):
     return [item for sublist in list for item in sublist]
@@ -336,12 +342,12 @@ if __name__ == "__main__":
     np.random.seed(2023)
 
     # specify ligand space and charges
-    ligands_names, ligands_charges = get_ligand_names_and_charges('1M')
+    ligands_names, ligands_charges = get_ligand_names_and_charges('1B')
 
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
     # GA parameters
-    n_population = 4
+    n_population = 1300
     n_parents = n_population // 2
     n_offspring = n_population
 
@@ -357,7 +363,7 @@ if __name__ == "__main__":
             n_allowed_duplicates=0,
             solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])],
             genome_equivalence_function=are_rotation_equivalents,
-            masking_function=functools.partial(zero_mask_target_by_population_median, target_indices=[0,1], scaling=[0.5,1])
+            masking_function=functools.partial(zero_mask_target_by_population_median, target_indices=[0,1], scaling=[0,0])
     )
 
     # random initial population
@@ -377,13 +383,13 @@ if __name__ == "__main__":
     initial_population = Population(initial_individuals)
 
     # run ga
-    final_pop, log = ga.run(n_epochs=1, initial_population=initial_population)
-
-    for i, individual in enumerate(final_pop.individuals):
-        
-        print(individual.meta)
-        # print(individual.meta['initial_xyz']) 
-        # print(individual.meta['optimised_xyz']) 
+    final_pop, log = ga.run(n_epochs=100, initial_population=initial_population)
 
     with open('log.pickle', 'wb') as fh:
         pickle.dump(log, fh)
+
+    for i, individual in enumerate(final_pop.individuals):
+        
+        # print(individual.meta)
+        print(individual.meta['initial_xyz']) 
+        print(individual.meta['optimised_xyz']) 
