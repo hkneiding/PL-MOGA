@@ -383,7 +383,7 @@ if __name__ == "__main__":
     initial_population = Population(initial_individuals)
 
     # run ga
-    final_pop, log = ga.run(n_epochs=100, initial_population=initial_population)
+    final_pop, log = ga.run(n_epochs=150, initial_population=initial_population)
 
     with open('log.pickle', 'wb') as fh:
         pickle.dump(log, fh)
