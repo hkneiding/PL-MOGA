@@ -86,7 +86,7 @@ def get_ligand_names_and_charges(space):
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ]
 
-    elif space == '1B_rand':
+    elif space == '1B_rand1':
         
         ligand_names = [
             'DUHDUF-subgraph-1', 'YEDKIE-subgraph-2', 'WAFZEJ-subgraph-3', 'UDOVAN-subgraph-1', 'VORCEN-subgraph-0',
@@ -152,7 +152,141 @@ def get_ligand_names_and_charges(space):
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ]
+    elif space == '1B_rand2':
+        
+        ligand_names = [
+            'NOZFIR-subgraph-0', 'VIGXAM-subgraph-0', 'OWEPUC-subgraph-3', 'ATUREM-subgraph-2', 'OHUTAN-subgraph-3',
+            'HARPIZ-subgraph-1', 'ROCQAC-subgraph-0', 'QOKYAQ-subgraph-2', 'SIFBUG-subgraph-1', 'QIGCOA-subgraph-2',
+            'XUBMEO-subgraph-0', 'HOXKAG-subgraph-1', 'GALFII-subgraph-2', 'TAWNEN-subgraph-0', 'WUTPEI-subgraph-1',
+            'NOLGED-subgraph-1', 'VEZHAK-subgraph-2', 'GEYYUG-subgraph-1', 'HAJWAS-subgraph-0', 'YAMFAU-subgraph-2',
+            'XUZZOH-subgraph-0', 'PARPEG-subgraph-1', 'TORBEJ-subgraph-1', 'YULCOY-subgraph-0', 'ACETUX-subgraph-1',
+            'AFANEC-subgraph-2', 'REFRAV-subgraph-0', 'RUZBUK-subgraph-3', 'GEDXOC-subgraph-5', 'SANMOJ-subgraph-1',
+            'RAXQAI-subgraph-0', 'ECUZEI-subgraph-3', 'TALDUI-subgraph-1', 'QUVXEL-subgraph-2', 'SAJQEA-subgraph-0',
+            'QANQAA-subgraph-1', 'BIMRIY-subgraph-0', 'XAPDIB-subgraph-3', 'BEJGOM-subgraph-1', 'AFUSEZ-subgraph-3',
+            'XALFEV-subgraph-5', 'KIBPAN-subgraph-1', 'KUWLAR-subgraph-0', 'SEWNUE-subgraph-5', 'SOPVIC-subgraph-0',
+            'EDEXIX-subgraph-1', 'PATKEC-subgraph-1', 'IPEMAR-subgraph-0', 'RUVZOZ-subgraph-5', 'WOPMIA-subgraph-0',
+            'OMELAU-subgraph-1', 'NIHTUT-subgraph-3', 'ZAHYIT-subgraph-1', 'TEQYOF-subgraph-3', 'LALGAG-subgraph-2',
+            'KIJFOZ-subgraph-3', 'ZODQUE-subgraph-1', 'WESPIW-subgraph-0', 'ICPNMN-subgraph-1', 'TIRFUY-subgraph-0',
+            'LUSDUA-subgraph-0', 'ZAPLEH-subgraph-2', 'YECKIC-subgraph-1', 'MUJVUK-subgraph-0', 'COJBEK-subgraph-1',
+            'RUQHIV-subgraph-2', 'IXIXUJ-subgraph-2', 'SINFUQ-subgraph-4', 'LICCEF-subgraph-0', 'YARFEC-subgraph-0',
+            'LUWRIE-subgraph-2', 'EPADUW-subgraph-1', 'YIKXUM-subgraph-1', 'CHVICR-subgraph-1', 'DISFIU-subgraph-3',
+            'TAXJIM-subgraph-0', 'PESJIJ-subgraph-3', 'SOWDIR-subgraph-0', 'SAXDAY-subgraph-3', 'FIBLOS-subgraph-0',
+            'CORPAD-subgraph-1', 'CUFPOI-subgraph-0', 'ROBGOG-subgraph-1', 'KEDQOA-subgraph-1', 'MIMHEY-subgraph-2',
+            'QABMIP-subgraph-1', 'UBOCAP-subgraph-2', 'TIQTAO-subgraph-3', 'FOFYAA-subgraph-0', 'WEFPOM-subgraph-0',
+            'AQERIY-subgraph-3', 'VOVQUU-subgraph-0', 'IDOSOJ-subgraph-0', 'RUFLEJ-subgraph-3', 'USEYOH-subgraph-1',
+            'GUVKIT-subgraph-3', 'ZOBPAK-subgraph-1', 'HEZQAG-subgraph-0', 'YITVOM-subgraph-1', 'CILPIZ-subgraph-1',
+            'LAJTUL-subgraph-1', 'QONSAO-subgraph-0', 'EWULAJ-subgraph-0', 'QIJGOF-subgraph-0', 'DUXFUZ-subgraph-0',
+            'INENOF-subgraph-1', 'TABXOJ-subgraph-0', 'ISAKAP-subgraph-0', 'DAQJAI-subgraph-1', 'XUNRII-subgraph-0',
+            'JODGIV-subgraph-3', 'EFOXEF-subgraph-1', 'LAHYUO-subgraph-3', 'FOGQEX-subgraph-2', 'JAHCAW-subgraph-2',
+            'YOMTUR-subgraph-3', 'EFOBUW-subgraph-2', 'HIBNOY-subgraph-1', 'YAKLUR-subgraph-0', 'HIXXOB-subgraph-2',
+            'ISEPIH-subgraph-1', 'WIRHOU-subgraph-2', 'JESGEU-subgraph-1', 'QUHZID-subgraph-1', 'SAGJEP-subgraph-3',
+            'PUJMAK-subgraph-0', 'NEKLIZ-subgraph-3', 'MOFKEX-subgraph-4', 'RIBSAX-subgraph-1', 'RAXQIQ-subgraph-2',
+            'ROBPII-subgraph-1', 'SATGEC-subgraph-0', 'MOWWUR-subgraph-0', 'BAPDAY-subgraph-1', 'RECDAG-subgraph-1',
+            'LOVPIV-subgraph-5', 'IVOJEI-subgraph-0', 'CAQNOZ-subgraph-1', 'ASANIS-subgraph-3', 'FEPKIX-subgraph-2',
+            'LABXIW-subgraph-1', 'TESGAB-subgraph-0', 'YUKLIA-subgraph-4', 'UDAKAM-subgraph-1', 'NUMNAL-subgraph-0',
+            'IPUYIB-subgraph-0', 'AMIQIX-subgraph-0', 'XEHVAJ-subgraph-1', 'REDGAJ-subgraph-0', 'ZESKOK-subgraph-2',
+            'XILHAB-subgraph-0', 'GOXFII-subgraph-4', 'TIGXIQ-subgraph-0', 'BARQER-subgraph-0', 'REFTOO-subgraph-3',
+            'VAVSEQ-subgraph-1', 'YAKFEY-subgraph-0', 'ADUROH-subgraph-1', 'YORTOP-subgraph-1', 'REZCAA-subgraph-1',
+            'QAQTOS-subgraph-2', 'SUVTUA-subgraph-0', 'WIHVEQ-subgraph-3', 'SICFEA-subgraph-0', 'VIHLEF-subgraph-4',
+            'DOCYOL-subgraph-2', 'JOHNIE-subgraph-3', 'JANLIW-subgraph-2', 'KEWCOH-subgraph-0', 'NOMJOP-subgraph-3',
+            'PAQPED-subgraph-2', 'AHASAF-subgraph-0', 'OBOSAZ-subgraph-0', 'PIJHEV-subgraph-0', 'QAPSOP-subgraph-1',
+            'IQIWAG-subgraph-1', 'OPEREI-subgraph-1', 'SANFAO-subgraph-3', 'LUFHOL-subgraph-3', 'IGUGUO-subgraph-1',
+            'WAQWEQ-subgraph-2', 'MINYAL-subgraph-1', 'RAZKAE-subgraph-0', 'NOSNIU-subgraph-1', 'BEMBIE-subgraph-3',
+            'PIBNEV-subgraph-0', 'NEGWEE-subgraph-1', 'WAYNIW-subgraph-1', 'ATECUY-subgraph-0', 'RATJAA-subgraph-0',
+            'UGAQEA-subgraph-0', 'PERPIO-subgraph-1', 'JASGAM-subgraph-0', 'YAMXOA-subgraph-0', 'MINXOY-subgraph-1',
+            'MURTUP-subgraph-3', 'MOMBUN-subgraph-0', 'FELSUN-subgraph-0', 'QIFXAG-subgraph-2', 'JOBBEK-subgraph-2',
+            'COFWOJ-subgraph-0', 'LEGXEA-subgraph-1', 'ZECGAS-subgraph-0', 'HISREJ-subgraph-0', 'HICRAN-subgraph-0',
+            'YIHPAI-subgraph-1', 'NASKUO-subgraph-1', 'XUVKUV-subgraph-3', 'VUFYIG-subgraph-3', 'TIPXIZ-subgraph-3',
+            'AJIGAC-subgraph-0', 'SIDNIE-subgraph-0', 'QIJYUG-subgraph-0', 'JIPPEG-subgraph-1', 'YERWEX-subgraph-2',
+            'NACTUH-subgraph-2', 'NIHRIH-subgraph-0', 'EKIGEM-subgraph-3', 'JIWSAJ-subgraph-0', 'REDLAQ-subgraph-0',
+            'JEWBUL-subgraph-1', 'YINNIS-subgraph-0', 'ICEFOL-subgraph-0', 'RAKGIV-subgraph-0', 'VABYUT-subgraph-2',
+            'AQULUT-subgraph-0', 'IYUDOV-subgraph-0', 'WIJCIC-subgraph-1', 'SICSAZ-subgraph-1', 'KEJPEV-subgraph-2',
+            'YEFKOJ-subgraph-3', 'EDAXOY-subgraph-1', 'COCSET-subgraph-0', 'NEDNIU-subgraph-0', 'RICLUK-subgraph-0',
+            'GEQXAC-subgraph-2', 'IZIDAW-subgraph-0', 'DOCRUJ-subgraph-1', 'ROBRAB-subgraph-1', 'CUSREN-subgraph-3',
+            'DEFGAZ-subgraph-3', 'RUQNOI-subgraph-1', 'JITSAG-subgraph-1', 'WASQUC-subgraph-0', 'IKESIB-subgraph-1',
+            'ITIFEY-subgraph-2', 'YUCKOY-subgraph-5', 'ZUJWUY-subgraph-2', 'BEQFIO-subgraph-1', 'JADVIW-subgraph-0',
+            'HAMQOB-subgraph-1', 'DACCOA-subgraph-0'
+        ]
+        ligand_charges = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+        ]
 
+    elif space == '1B_rand3':
+        
+        ligand_names = [
+            'FOSFID-subgraph-3', 'HIWJON-subgraph-0', 'BIYJAU-subgraph-3', 'GECHOO-subgraph-0', 'FOSZOD-subgraph-1',
+            'JUSROG-subgraph-2', 'RAZLOW-subgraph-0', 'YUJZUA-subgraph-2', 'ZOJJUD-subgraph-2', 'ASIGOZ-subgraph-1',
+            'REFCIQ-subgraph-2', 'SAWHUU-subgraph-1', 'LORVUL-subgraph-5', 'PESDUN-subgraph-2', 'DARVOI-subgraph-0',
+            'NECVAV-subgraph-0', 'NEGDUZ-subgraph-1', 'MAFYOK-subgraph-0', 'HIXZEU-subgraph-0', 'BOQQOQ-subgraph-2',
+            'SAQLAA-subgraph-2', 'LEFREW-subgraph-0', 'GIPQAA-subgraph-1', 'MOCFUH-subgraph-3', 'LAHTUJ-subgraph-4',
+            'SIFCAN-subgraph-3', 'KEWDAU-subgraph-0', 'ALUNOM-subgraph-1', 'MOHPIJ-subgraph-0', 'MEWXAQ-subgraph-4',
+            'NUYYIR-subgraph-2', 'QIWWID-subgraph-1', 'OCEBUW-subgraph-0', 'QIDKUL-subgraph-1', 'MOZFEO-subgraph-0',
+            'CUTHOP-subgraph-0', 'QONTES-subgraph-5', 'RAMRED-subgraph-0', 'CUDJAN-subgraph-2', 'GUKGAW-subgraph-1',
+            'QUWPOO-subgraph-0', 'JEDLAI-subgraph-3', 'QOZBIS-subgraph-1', 'ROBGOH-subgraph-4', 'JUJSUC-subgraph-2',
+            'YOQBOW-subgraph-1', 'TUDREQ-subgraph-3', 'COPPUT-subgraph-0', 'UNAMIF-subgraph-5', 'LOPPEL-subgraph-0',
+            'XANGEB-subgraph-2', 'ZIWBUF-subgraph-2', 'SATJIJ-subgraph-1', 'DOXMEI-subgraph-1', 'NUZXEM-subgraph-2',
+            'IWAYUC-subgraph-0', 'IGAKEJ-subgraph-1', 'CEVKUJ-subgraph-0', 'GUTNOZ-subgraph-1', 'EVOGUT-subgraph-0',
+            'TAVROZ-subgraph-1', 'JALGIN-subgraph-1', 'MUVPAW-subgraph-1', 'SEGRUT-subgraph-0', 'HOCDEJ-subgraph-0',
+            'HILMEW-subgraph-3', 'CUJHAS-subgraph-0', 'BOFROF-subgraph-2', 'JIZKAH-subgraph-0', 'GEQNIA-subgraph-2',
+            'ZIZHEX-subgraph-1', 'RIZNUL-subgraph-0', 'PUTKOG-subgraph-2', 'IGUXAK-subgraph-1', 'FOSFOJ-subgraph-2',
+            'BEJFIG-subgraph-0', 'ADETIO-subgraph-1', 'EGUDAM-subgraph-3', 'TABSOF-subgraph-5', 'LUGRAI-subgraph-1',
+            'ROWWIL-subgraph-1', 'SOTFOY-subgraph-0', 'IXOKUB-subgraph-5', 'VIXSOL-subgraph-1', 'POCDUG-subgraph-1',
+            'IXEHOJ-subgraph-3', 'LIWVAR-subgraph-0', 'NAHMEQ-subgraph-1', 'YULCAK-subgraph-0', 'COHMIW-subgraph-0',
+            'MAXGIC-subgraph-2', 'EHUSUV-subgraph-0', 'BUTZUM-subgraph-1', 'NOZHOB-subgraph-0', 'KIYSOA-subgraph-1',
+            'DIHVEY-subgraph-1', 'XOPFUD-subgraph-0', 'YORXOT-subgraph-1', 'CAPSOB-subgraph-5', 'XUWGUR-subgraph-0',
+            'ZOMJET-subgraph-1', 'GALNUF-subgraph-1', 'QEHCEN-subgraph-1', 'HEBDOI-subgraph-0', 'WODSIR-subgraph-5',
+            'KATREC-subgraph-3', 'AMAZOE-subgraph-1', 'QEHLIA-subgraph-3', 'SODFAV-subgraph-2', 'BOJPOI-subgraph-0',
+            'FUTHOR-subgraph-3', 'UMAGUL-subgraph-1', 'YETLEO-subgraph-0', 'GEHQEQ-subgraph-1', 'GAYVOR-subgraph-1',
+            'POWCEJ-subgraph-1', 'MOWGIQ-subgraph-1', 'JAWZAJ-subgraph-3', 'AVACIJ-subgraph-1', 'IWAZUB-subgraph-0',
+            'OMINAZ-subgraph-0', 'COFWUR-subgraph-0', 'TIWYUW-subgraph-0', 'JEYZAP-subgraph-2', 'ZOSSOS-subgraph-1',
+            'VALFEV-subgraph-2', 'HOGFER-subgraph-0', 'CERWOL-subgraph-5', 'AYIGEW-subgraph-1', 'KOCGAL-subgraph-2',
+            'WACMUJ-subgraph-1', 'DAMBUO-subgraph-3', 'SENDUM-subgraph-3', 'LIVYUK-subgraph-1', 'OWUHEU-subgraph-0',
+            'EPOMOM-subgraph-1', 'QORLIS-subgraph-1', 'NOWHEO-subgraph-2', 'XUKGOZ-subgraph-1', 'CECHIE-subgraph-1',
+            'INIJIY-subgraph-0', 'UFENAX-subgraph-1', 'UHEDAN-subgraph-0', 'RUGTAP-subgraph-0', 'BONRIF-subgraph-0',
+            'SIJKEB-subgraph-0', 'VEGGIY-subgraph-0', 'ATUROW-subgraph-2', 'XUKGUF-subgraph-1', 'IVUNAQ-subgraph-2',
+            'URUKOI-subgraph-0', 'WEMKUV-subgraph-2', 'WEHSOS-subgraph-1', 'ZIHBEX-subgraph-1', 'FIRCER-subgraph-1',
+            'FEKQEU-subgraph-0', 'ODOGOF-subgraph-2', 'XAKGUL-subgraph-1', 'RASKAX-subgraph-1', 'IBIHAC-subgraph-0',
+            'FIHKEM-subgraph-2', 'AGITOA-subgraph-0', 'ICERUD-subgraph-2', 'EGADAU-subgraph-3', 'RAXVAN-subgraph-0',
+            'WOSVIJ-subgraph-2', 'PIJLIE-subgraph-1', 'LOGNEA-subgraph-0', 'GIXFEY-subgraph-1', 'VAMYUF-subgraph-1',
+            'ORUCAG-subgraph-3', 'NEDFUY-subgraph-1', 'VAXMOX-subgraph-2', 'FADJUP-subgraph-3', 'WAYHOW-subgraph-0',
+            'EVAGUD-subgraph-0', 'LEHQOE-subgraph-1', 'YIDFUP-subgraph-1', 'UMUTUR-subgraph-0', 'AJIJAF-subgraph-0',
+            'GULXOC-subgraph-3', 'PAKVUU-subgraph-0', 'YIQQAQ-subgraph-1', 'TARNIJ-subgraph-1', 'SIXBUY-subgraph-1',
+            'MOVYAZ-subgraph-4', 'WAJYAK-subgraph-3', 'SADHAG-subgraph-3', 'FILVIG-subgraph-1', 'DECSOW-subgraph-1',
+            'DOPWAH-subgraph-1', 'QOJSOX-subgraph-0', 'MICZUV-subgraph-0', 'UDOPIM-subgraph-3', 'BIGYIZ-subgraph-1',
+            'QARDAQ-subgraph-0', 'NORYUO-subgraph-2', 'FUJLUT-subgraph-0', 'BOFGOS-subgraph-1', 'OZEVOF-subgraph-2',
+            'WAYJIS-subgraph-0', 'GUVQUJ-subgraph-0', 'LEXKAB-subgraph-1', 'LAJTEW-subgraph-3', 'SENFAU-subgraph-2',
+            'JAFKAF-subgraph-2', 'RELWEM-subgraph-0', 'DUKBIW-subgraph-1', 'FIHYIF-subgraph-2', 'GORREM-subgraph-0',
+            'BUBCEI-subgraph-0', 'TEGZUD-subgraph-1', 'NEXFOL-subgraph-2', 'LEDVAS-subgraph-0', 'WIBTAD-subgraph-2',
+            'XOJRAP-subgraph-0', 'DEDKII-subgraph-5', 'FUWXOM-subgraph-0', 'FELJIR-subgraph-0', 'YEPSIV-subgraph-2',
+            'ZOBKIN-subgraph-0', 'KEVYER-subgraph-1', 'MIYWUM-subgraph-0', 'XEDKAT-subgraph-1', 'TORXUT-subgraph-4',
+            'VAVQUE-subgraph-1', 'PIYNOC-subgraph-0', 'WULFIT-subgraph-1', 'SUQTAZ-subgraph-4', 'UHOJOS-subgraph-1',
+            'POKRAJ-subgraph-0', 'IPEPUQ-subgraph-1', 'KUPQAP-subgraph-0', 'AREJUD-subgraph-3', 'VEFSUX-subgraph-2',
+            'FIDPIT-subgraph-1', 'UQINAL-subgraph-0', 'ERAZUU-subgraph-3', 'ACITEO-subgraph-1', 'FIHTOF-subgraph-1',
+            'ALOBUY-subgraph-3', 'UQUZEM-subgraph-0', 'TIZKAR-subgraph-0', 'BIQTOM-subgraph-0', 'HISRAF-subgraph-0',
+            'WILHOR-subgraph-0', 'SISRUK-subgraph-2', 'ZAJLAX-subgraph-1', 'PUDBAR-subgraph-1', 'YAXFOS-subgraph-0',
+            'RIWYON-subgraph-0', 'MEXXES-subgraph-3'
+        ]
+
+        
+        ligand_charges = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+        ]
     else:
         raise Exception('Space name not recognized.')
     
