@@ -22,13 +22,12 @@ element_identifiers = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',
                         'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb',
                         'Bi', 'Po', 'At', 'Rn']
 
-transition_metal_atomic_numbers = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30,                          # first block
+transition_metal_atomic_numbers = [21, 22, 23, 24, 25, 26, 27, 28, 29, 30,                           # first block
                                     39, 40, 41, 42, 43, 44, 45, 46, 47, 48,                          # second block
                                     57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71,      # lanthanides
                                     72, 73, 74, 75, 76, 77, 78, 79, 80,                              # third block
                                     89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103,  # actinides
                                     104, 105, 106, 107, 108, 109, 110, 111, 112]                     # fourth block
-
 
 @contextmanager
 def change_directory(destination: str):
@@ -39,33 +38,38 @@ def change_directory(destination: str):
     finally:
         os.chdir(cwd)
 
-
 def compose(*functions):
+
+    """Composes a given list of functions.
+
+    Returns:
+        callable: The composed function.
+    """
+
     return functools.reduce(lambda f, g: lambda x: f(g(x)), functions)
 
-def load_data(src_dir: str):
+def flatten_list(list: list):
 
-    data_dict = {}
+    """Flattens a given list.
 
-    with open(src_dir + 'ligands_xyz.xyz') as fh:
-        raw_xyz = fh.read()
+    Returns:
+        list: The flattened list.
+    """
 
-    xyzs = raw_xyz.split('\n\n')
-    for xyz in xyzs:
+    return [item for sublist in list for item in sublist]
 
-        id = xyz.split('\n')[1]
-        data_dict[id] = {'xyz': xyz}
+def charge_range(individual, charges, allowed_charges):
+
+    """Checks if a given individual is within the allowed charge range.
+
+    Returns:
+        bool: The flag indicating whether the individual is within the allowed charge range.
+    """
+
+    if calculate_total_charge(individual, charges) in allowed_charges:
+        return True
     
-    fingerprints = pd.read_csv(src_dir + 'ligands_fingerprints.csv', sep=';')
-    for fingerprint in fingerprints.to_dict(orient='records'):
-
-        data_dict[fingerprint['name']]['charge'] = fingerprint['charge']
-        data_dict[fingerprint['name']]['n_metal_bound'] = fingerprint['n_metal_bound']
-        data_dict[fingerprint['name']]['n_atoms'] = fingerprint['n_atoms']
-
-    df = pd.DataFrame(data_dict).T
-
-    return df
+    return False
 
 def are_rotation_equivalents(l1: list, l2: list):
 
@@ -240,12 +244,10 @@ def fitness_function(individual, key_mapping, charges):
         float: The fitness.
     """
 
-    # set unique run directory
+    # make unique run directory
     tmp_dir = str(id(individual)) + individual.meta['creation_date'].replace(' ', '') + '/'
-    # while os.path.exists(tmp_dir):
-    #     tmp_dir = str(id(individual)) + tmp_dir
-
     os.mkdir(tmp_dir)
+
     with change_directory(tmp_dir):
         # prepare molsimplify parameters
         parameters = ['-skipANN True',
@@ -275,14 +277,12 @@ def fitness_function(individual, key_mapping, charges):
         individual.meta['optimised_xyz'] = result['optimised_xyz']
 
     except FileNotFoundError:
-        print(result)
-
-        print('molSimplify Failed: genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
+        print('molSimplify failure. Genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
         individual.set_fitness([0,0])
         return individual
 
     except RuntimeError:
-        print('xTB Failed: genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
+        print('xTB failure. Genome: ' + ','.join([key_mapping[i] for i in individual.genome]))
         individual.set_fitness([0,0])
         return individual
 
@@ -311,20 +311,9 @@ def fitness_function(individual, key_mapping, charges):
         individual.set_fitness([0,0])
         return individual
 
-    # stabilisation_energy = -result['energy'] / get_electron_count_from_xyz(result['optimised_xyz'], calculate_total_charge(individual, charges))
-
+    # update fitness and return
     individual.set_fitness([result['polarisability'], result['homo_lumo_gap']])
     return individual 
-
-def flatten_list(list: list):
-    return [item for sublist in list for item in sublist]
-
-def charge_range(individual, charges, allowed_charges):
-
-    if calculate_total_charge(individual, charges) in allowed_charges:
-        return True
-    
-    return False
                 
 if __name__ == "__main__":
 
@@ -342,18 +331,20 @@ if __name__ == "__main__":
     np.random.seed(2023)
 
     # specify ligand space and charges
-    ligands_names, ligands_charges = get_ligand_names_and_charges('1B')
+    ligands_names, ligands_charges = get_ligand_names_and_charges('1M')
 
     print('Using ' + str(len(ligands_names)) + ' ligands.')
 
     # GA parameters
-    n_population = 1300
+    n_population = 130
     n_parents = n_population // 2
     n_offspring = n_population
 
+    # build two sub-mutations to be combined
     sub_mutation_1 = functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5)
     sub_mutation_2 = functools.partial(swap_mutation, mutation_rate=0.5)
 
+    # set up GA
     ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
             parent_selection=functools.partial(roulette_wheel_rank, n_selected=n_parents, rank_function=rank_non_dominated_fronts),
             survivor_selection=functools.partial(select_by_rank, n_selected=n_population, rank_function=rank_is_dominated),
@@ -385,11 +376,6 @@ if __name__ == "__main__":
     # run ga
     final_pop, log = ga.run(n_epochs=150, initial_population=initial_population)
 
+    # save log
     with open('log.pickle', 'wb') as fh:
         pickle.dump(log, fh)
-
-    for i, individual in enumerate(final_pop.individuals):
-        
-        # print(individual.meta)
-        print(individual.meta['initial_xyz']) 
-        print(individual.meta['optimised_xyz']) 

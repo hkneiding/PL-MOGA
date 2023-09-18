@@ -136,14 +136,3 @@ class Population:
                 dominated_individuals.append(individual)
 
         return dominated_individuals
-
-    def rank_population(self, ranking_function: Callable):
-
-        """Ranks and sorts the population according to a specified rule.
-
-        Arguments:
-            ranking_function (Callable): The function used to rank the individuals.
-        """
-
-        pass
-        # self.individuals = ranking_function(self.individuals) 
