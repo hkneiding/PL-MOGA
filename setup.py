@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
-from gapy import __version__
+#from gapy import __version__
 
 setup(
     name='gapy',
-    version=__version__,
+    version='1.0'__version__,
 
     url='https://github.com/hkneiding/PL-MOGA',
     author='Hannes Kneiding',
