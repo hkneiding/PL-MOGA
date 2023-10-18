@@ -8,5 +8,5 @@ setup(
     url='https://github.com/hkneiding/PL-MOGA',
     author='Hannes Kneiding',
     author_email='hannes.kneiding@outlook.com',
-    packages=find_packages(exclude=['test'])
+    packages=['gapy']#find_packages(exclude=['test'])
 )
