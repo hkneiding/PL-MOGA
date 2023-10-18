@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='gapy',
-    version='1.0'#__version__,
+    version='1.0',#__version__,
 
     url='https://github.com/hkneiding/PL-MOGA',
     author='Hannes Kneiding',
