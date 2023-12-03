@@ -1,4 +1,6 @@
 import os
+import sys
+import yaml
 import datetime
 import shutil
 import pickle
@@ -314,55 +316,126 @@ def fitness_function(individual, key_mapping, charges):
     # update fitness and return
     individual.set_fitness([result['polarisability'], result['homo_lumo_gap']])
     return individual 
-                
+
+def parse_config_file(file_path: str):
+
+    """Parses a config file and returns a dictionary with all relevant parameters.
+
+    Returns:
+        dict: The parameter dictionary.
+    """
+
+    with open(file_path, 'r') as fh:
+        config = yaml.safe_load(fh)
+
+    # specify ligand space and charges
+    config['ligands_names'], config['ligands_charges'] = get_ligand_names_and_charges(config['ligand_space'])
+
+    if config['parent_selection'] == 'roulette_wheel_rank':
+        config['parent_selection'] = roulette_wheel_rank
+    elif config['parent_selection'] == 'select_by_rank':
+        config['parent_selection'] = select_by_rank
+    else:
+        print('Config not found:', config['parent_selection'])
+
+    if config['parent_rank'] == 'rank_dominate':
+        config['parent_rank'] = rank_dominate
+    elif config['parent_rank'] == 'rank_is_dominated':
+        config['parent_rank'] = rank_is_dominated
+    elif config['parent_rank'] == 'rank_non_dominated_fronts':
+        config['parent_rank'] = rank_non_dominated_fronts
+    else:
+        print('Config not found:', config['parent_rank'])
+
+    if config['survivor_selection'] == 'roulette_wheel_rank':
+        config['survivor_selection'] = roulette_wheel_rank
+    elif config['survivor_selection'] == 'select_by_rank':
+        config['survivor_selection'] = select_by_rank
+    else:
+        print('Config not found:', config['survivor_selection'])
+
+    if config['survivor_rank'] == 'rank_dominate':
+        config['survivor_rank'] = rank_dominate
+    elif config['survivor_rank'] == 'rank_is_dominated':
+        config['survivor_rank'] = rank_is_dominated
+    elif config['survivor_rank'] == 'rank_non_dominated_fronts':
+        config['survivor_rank'] = rank_non_dominated_fronts
+    else:
+        print('Config not found:', config['survivor_rank'])
+
+    if config['crossover'] == 'uniform_crossover':
+        config['crossover'] = uniform_crossover
+    else:
+        print('Config not found:', config['crossover'])
+
+    for i, _ in enumerate(config['mutations']):
+        if config['mutations'][i] == 'swap_mutation':
+            config['mutations'][i] = functools.partial(
+                swap_mutation,
+                mutation_rate=config['mutation_rates'][i])
+        elif config['mutations'][i] == 'uniform_integer_mutation':
+            config['mutations'][i] = functools.partial(
+                uniform_integer_mutation, 
+                mutation_space=len(config['ligands_names']), 
+                mutation_rate=config['mutation_rates'][i]
+            )
+        else:
+            print('Config not found:', config['mutations'][i])
+
+    # compose mutations
+    config['composed_mutation'] = config['mutations'][0]
+    for i in range(1, len(config['mutations']), 1):
+        config['composed_mutation'] = compose(config['composed_mutation'], config['mutations'][i])
+
+    return config
+    
+
 if __name__ == "__main__":
 
     from gapy.individual import Individual
     from gapy.population import Population
     from gapy.mutation import uniform_integer_mutation, swap_mutation
     from gapy.crossover import uniform_crossover
-    from gapy.selection import select_by_fitness, roulette_wheel_fitness, select_by_rank, roulette_wheel_rank
-    from gapy.rank import rank_dominate, rank_is_dominated, rank_non_dominated_fronts, rank_dominate_by_feature, rank_is_dominated_by_feature
+    from gapy.selection import select_by_rank, roulette_wheel_rank
+    from gapy.rank import rank_dominate, rank_is_dominated, rank_non_dominated_fronts
     from gapy.ga import GA
 
     from ligands_info import get_ligand_names_and_charges
 
+    config = parse_config_file(sys.argv[1])
+
     # fix random seed
-    np.random.seed(2023)
+    np.random.seed(config['seed'])
 
-    # specify ligand space and charges
-    ligands_names, ligands_charges = get_ligand_names_and_charges('1M')
-
-    print('Using ' + str(len(ligands_names)) + ' ligands.')
-
-    # GA parameters
-    n_population = 130
-    n_parents = n_population // 2
-    n_offspring = n_population
-
-    # build two sub-mutations to be combined
-    sub_mutation_1 = functools.partial(uniform_integer_mutation, mutation_space=len(ligands_names), mutation_rate=0.5)
-    sub_mutation_2 = functools.partial(swap_mutation, mutation_rate=0.5)
+    print('Using ' + str(len(config['ligands_names'])) + ' ligands.')
 
     # set up GA
-    ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=ligands_names, charges=ligands_charges),
-            parent_selection=functools.partial(roulette_wheel_rank, n_selected=n_parents, rank_function=rank_non_dominated_fronts),
-            survivor_selection=functools.partial(select_by_rank, n_selected=n_population, rank_function=rank_is_dominated),
-            crossover=functools.partial(uniform_crossover, mixing_ratio=0.5),
-            mutation=compose(sub_mutation_2, sub_mutation_1),
-            n_offspring=n_offspring,
-            n_allowed_duplicates=0,
-            solution_constraints=[functools.partial(charge_range, charges=ligands_charges, allowed_charges=[-1, 0, 1])],
+    ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=config['ligands_names'], charges=config['ligands_charges']),
+            parent_selection=functools.partial(config['parent_selection'], n_selected=config['n_parents'], rank_function=config['parent_rank']),
+            survivor_selection=functools.partial(config['survivor_selection'], n_selected=config['n_population'], rank_function=config['survivor_rank']),
+            crossover=functools.partial(config['crossover'], mixing_ratio=config['crossover_mixing']),
+            mutation=config['composed_mutation'],
+            n_offspring=config['n_offspring'],
+            n_allowed_duplicates=config['n_allowed_duplicates'],
+            solution_constraints=[functools.partial(charge_range, charges=config['ligands_charges'], allowed_charges=config['allowed_charges'])],
             genome_equivalence_function=are_rotation_equivalents,
             masking_function=functools.partial(zero_mask_target_by_population_median, target_indices=[0,1], scaling=[0,0])
     )
 
     # random initial population
     initial_individuals = []
-    for i in range(n_population):
+    for i in range(config['n_population']):
 
-        neutral_choice = np.random.randint(0, high=25, size=2)
-        anionic_choice = np.random.randint(25, high=50, size=2)
+        neutral_choice = np.random.randint(
+            0, 
+            high=len(config['ligands_names']) // 2,
+            size=config['n_ligands'] // 2
+        )
+        anionic_choice = np.random.randint(
+            len(config['ligands_names']) // 2, 
+            high=len(config['ligands_names']), 
+            size=config['n_ligands'] - (config['n_ligands'] // 2)
+        )
 
         genome = np.random.permutation(np.concatenate((neutral_choice, anionic_choice))).tolist()
         initial_individuals.append(Individual(genome=genome, meta={
@@ -372,7 +445,7 @@ if __name__ == "__main__":
             'creation_date': str(datetime.datetime.now())}
         ))
     initial_population = Population(initial_individuals)
-
+    
     # run ga
     final_pop, log = ga.run(n_epochs=150, initial_population=initial_population)
 
