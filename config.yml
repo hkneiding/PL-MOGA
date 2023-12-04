@@ -1,8 +1,12 @@
 seed:
     2023
+target_properties:
+    [polarisability, homo_lumo_gap]
+zeromask_scaling_factors:
+    [0, 0]
 ligand_space:
     1M
-n_epochs:
+n_generations:
     100
 n_population:
     4

@@ -238,7 +238,7 @@ def calculate_total_charge(individual, charges: list):
 
     return individual.meta['oxidation_state'] + sum([int(charges[_]) for _ in individual.genome])
 
-def fitness_function(individual, key_mapping, charges):
+def fitness_function(individual, target_properties, key_mapping, charges):
 
     """Calculates the fitness of a organometallic compound using xTB based on quantum properties.
 
@@ -314,7 +314,11 @@ def fitness_function(individual, key_mapping, charges):
         return individual
 
     # update fitness and return
-    individual.set_fitness([result['polarisability'], result['homo_lumo_gap']])
+    fitness_vector = []
+    for target_property in target_properties:
+        fitness_vector.append(result[target_property])
+    individual.set_fitness(fitness_vector)
+
     return individual 
 
 def parse_config_file(file_path: str):
@@ -410,7 +414,7 @@ if __name__ == "__main__":
     print('Using ' + str(len(config['ligands_names'])) + ' ligands.')
 
     # set up GA
-    ga = GA(fitness_function=functools.partial(fitness_function, key_mapping=config['ligands_names'], charges=config['ligands_charges']),
+    ga = GA(fitness_function=functools.partial(fitness_function, target_properties=config['target_properties'], key_mapping=config['ligands_names'], charges=config['ligands_charges']),
             parent_selection=functools.partial(config['parent_selection'], n_selected=config['n_parents'], rank_function=config['parent_rank']),
             survivor_selection=functools.partial(config['survivor_selection'], n_selected=config['n_population'], rank_function=config['survivor_rank']),
             crossover=functools.partial(config['crossover'], mixing_ratio=config['crossover_mixing']),
@@ -419,7 +423,7 @@ if __name__ == "__main__":
             n_allowed_duplicates=config['n_allowed_duplicates'],
             solution_constraints=[functools.partial(charge_range, charges=config['ligands_charges'], allowed_charges=config['allowed_charges'])],
             genome_equivalence_function=are_rotation_equivalents,
-            masking_function=functools.partial(zero_mask_target_by_population_median, target_indices=[0,1], scaling=[0,0])
+            masking_function=functools.partial(zero_mask_target_by_population_median, target_indices=[i for i in range(len(config['zeromask_scaling_factors']))], scaling=config['zeromask_scaling_factors'])
     )
 
     # random initial population
@@ -447,7 +451,7 @@ if __name__ == "__main__":
     initial_population = Population(initial_individuals)
     
     # run ga
-    final_pop, log = ga.run(n_epochs=150, initial_population=initial_population)
+    final_pop, log = ga.run(n_epochs=config['n_generations'], initial_population=initial_population)
 
     # save log
     with open('log.pickle', 'wb') as fh:
