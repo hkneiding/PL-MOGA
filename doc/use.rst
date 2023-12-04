@@ -3,7 +3,7 @@ Usage
 
 We use a configuration file (`config.yml`) to set the hyperparameters of the genetic algorithm. Then running the model is simply done with
 
-.. code-block:**: console
+.. code-block:: console
 
   $ python main.py config.yml
 
