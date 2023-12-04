@@ -50,13 +50,13 @@ Installation
 
   $ pip install -e . --no-deps
 
-5. Then we install xTB with conda
+5. Then we install xTB with conda.
 
 .. code-block:: console
 
   $ conda install -c conda-forge xtb
 
-6. Then we install uxtbpy with pip
+6. Then we install uxtbpy with pip.
 
 .. code-block:: console
 

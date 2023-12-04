@@ -29,7 +29,7 @@ The following will discuss all the different parameters that can be changed in t
  - n_offspring: The number of offspring individuals to generate each generation.
  - parent_selection: The parent selection mechanism. Possible choice are roulette_wheel_rank and select_by_rank.
  - parent_rank: The ranking funtion used in the parent selection. Possible choices are rank_dominate, rank_is_dominated, and rank_non_dominated_fronts.
-survivor_selection: The survivor selection mechanism. Possible choice are roulette_wheel_rank and select_by_rank.
+ - survivor_selection: The survivor selection mechanism. Possible choice are roulette_wheel_rank and select_by_rank.
  - surivor_rank: The ranking funtion used in the survivor selection. Possible choices are rank_dominate, rank_is_dominated, and rank_non_dominated_fronts.
  - crossover: The crossover operation. Only uniform_crossover is implemented.
  - crossover_mixing: The mixing parameter for the crossover operation.
