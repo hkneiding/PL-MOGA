@@ -19,6 +19,25 @@ def get_ligand_names_and_charges(space):
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ]
 
+    elif space == '1M_phosphine':
+
+        ligand_names = [
+            'SASKIG-subgraph-0', 'ABESAB-subgraph-0', 'CBFMOP-subgraph-3', 'POXMOE-subgraph-0', 'APECOP-subgraph-0',
+            'GIJJIU-subgraph-0', 'LUCNON-subgraph-2', 'DAFXIT-subgraph-5', 'ZIBJOL-subgraph-1', 'ALUYEN-subgraph-1', 
+            'ACOMUA-subgraph-1', 'FOKYEJ-subgraph-0', 'TANLUP-subgraph-0', 'ZARYIC-subgraph-1', 'OJANUI-subgraph-3', 
+            'TAWNIO-subgraph-0', 'BAXMIY-subgraph-1', 'SIKYOC-subgraph-0', 'JAFWET-subgraph-0', 'IXUVEC-subgraph-3', 
+            'FEHWUK-subgraph-1', 'UMANAZ-subgraph-1', 'FICHAD-subgraph-0', 'IGUHAT-subgraph-0', 'EADJIC-subgraph-0', 
+            'WELJOM-subgraph-0', 'VOHDOL-subgraph-0', 'ZEQXIC-subgraph-0', 'LESQIM-subgraph-0', 'CIXJAU-subgraph-2', 
+            'BODWOG-subgraph-0', 'KACXES-subgraph-1', 'BUTMIM-subgraph-0', 'IGOBUD-subgraph-0', 'HEYXAM-subgraph-4', 
+            'XUKWUX-subgraph-0', 'JOHZAI-subgraph-2', 'LECZEZ-subgraph-0', 'AVOFAT-subgraph-0', 'CERWOL-subgraph-5', 
+            'COLPIC-subgraph-0', 'YUWNUB-subgraph-3', 'BUNFEW-subgraph-1', 'FUMZAQ-subgraph-1', 'NENFER-subgraph-0', 
+            'LIFLIV-subgraph-2', 'COLPOI-subgraph-0', 'SOWCOX-subgraph-1', 'NEYWET-subgraph-0', 'GIJNUJ-subgraph-0'
+        ]
+        ligand_charges = [
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+        ]
+
     elif space == '1B':
 
         ligand_names = [
