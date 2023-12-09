@@ -21,7 +21,7 @@ Installation
 
 .. note::
 
-   This installation guide uses the Python environment manager `conda <https://anaconda.org/>`_. If you are not familiar with conda you can familiarite yourself with it `here <https://docs.conda.io/en/latest/>`_.
+   This installation guide uses the Python environment manager `conda <https://anaconda.org/>`_. If you are not familiar with conda you can familiarize yourself with it `here <https://docs.conda.io/en/latest/>`_.
 
 1. Start by creating a conda environment and activating it.
 
