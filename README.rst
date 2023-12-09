@@ -18,15 +18,15 @@ Note that ``molSimplify`` has a lot of dependencies on its own and I recommend i
 How to use
 -----------
 
-The code can be obtained by running
+The code can be obtained by running::
     
-    git clone https://github.com/hkneiding/PL-MOGA
+    $ git clone https://github.com/hkneiding/PL-MOGA
 
 which copies the full project into your current working directory.
 
 Afterwards, runs can be started directly from the projects root directory using the command line::
 
-    python main.py config.yml
+    $ python main.py config.yml
 
 The ``config.yml`` file contains entries for all relevant PL-MOGA parameters and is used to configure PL-MOGA runs. 
 
