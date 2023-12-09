@@ -18,19 +18,19 @@ Note that ``molSimplify`` has a lot of dependencies on its own and I recommend i
 How to use
 -----------
 
-The backbone of the package can be installed directly from this repository with ``pip``::
+The code can be obtained by running
     
-    pip install git+https://github.com/hkneiding/PL-MOGA
+    git clone https://github.com/hkneiding/PL-MOGA
 
-which installs ``gapy`` as a library to your Python installation or virtual environment.
+which copies the full project into your current working directory.
 
-Afterwards you can import the library with:
+Afterwards, runs can be started directly from the projects root directory using the command line::
 
->>> import gapy
+    python main.py config.yml
 
-which provides mostly generic (MO)GA functions and a flexible framework to use your own selection, fitness and masking functions.
+The ``config.yml`` file contains entries for all relevant PL-MOGA parameters and is used to configure PL-MOGA runs. 
 
-To get a quick start into production you can use the code provided in ``main.py``. The only thing you need to supply are the names and charges of the ligands you want to use, which should be stored in ``ligands_info.py``. Note that the names of the ligands should be the same as the ones used in your molSimplify installation. Information on how to add your own custom ligands to molSimplify can be found `here <http://hjkgrp.mit.edu/tutorials/2018-05-09-molsimplify-tutorial-10-adding-ligands-molsimplify>`_
+For a detailed documentation, including comprehensive installation instructions and explainations of all parameters `read the docs <https://pl-moga.readthedocs.io/en/latest/setup.html>`_.
 
 Difficulties?
 -----------

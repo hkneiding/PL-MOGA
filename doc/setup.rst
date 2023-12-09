@@ -91,7 +91,12 @@ In order to add them to molSimplify's library you can use the `add_ligands_to_mo
 
   $ python add_ligands_to_molsimplify.py ligands.xyz
 
-Note that adding of the ligands can take some time. Once completed we are ready to setup runs in the chemical spaces introduced in the publication.
+Adding of the ligands can take some time. Once completed we are ready to setup runs in the chemical spaces introduced in the publication.
+
+.. note::
+
+  While the `ligands.xyz` contains the ligands of all experiments in the associated publication, we also provide invidual files with the ligands of each of the different chemical spaces explored (1M, 1M_phosphine, 1B, 1B_rand).
+
 
 .. note::
 
