@@ -1,0 +1,44 @@
+seed:
+    2023
+target_properties:
+    [polarisability, homo_lumo_gap]
+zeromask_scaling_factors:
+    [0, 0]
+ligand_space:
+    1M
+n_generations:
+    100
+n_population:
+    130
+n_parents:
+    65
+n_offspring:
+    130
+parent_selection:
+    roulette_wheel_fitness
+parent_rank:
+    rank_non_dominated_fronts
+survivor_selection:
+    select_by_fitness
+survivor_rank:
+    rank_is_dominated
+crossover:
+    uniform_crossover
+crossover_mixing:
+    0.5
+mutations:
+    [swap_mutation, uniform_integer_mutation]
+mutation_rates:
+    [0.5, 0.5]
+n_allowed_duplicates:
+    0
+n_ligands:
+    4
+metal_center:
+    Pd
+oxidation_state:
+    2
+coordination_geometry:
+    sqp
+allowed_charges:
+    [-1, 0, 1]
