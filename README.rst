@@ -5,7 +5,7 @@ Pareto Lighthouse Multiobjective Genetic Algorithm (PL-MOGA)
 ``PL-MOGA`` is a multiobjective genetic algorithm for the *de novo* design of transition metal complexes. It makes use of multiobjective selection functions and fitness masks to push the population towards specific regions of the Pareto front. Details of the implementation can be found in the corresponding publication `Directional multiobjective optimization of metal complexes at the billion-system scale <https://www.nature.com/articles/s43588-024-00616-5>`_.
 
 .. image:: PL-MOGA.png
-  :width: 400
+  :width: 800
 
 Requirements
 -----------
